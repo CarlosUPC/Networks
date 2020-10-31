@@ -10,11 +10,46 @@
 bool ModuleNetworkingServer::start(int port)
 {
 	// TODO(jesus): TCP listen socket stuff
+
 	// - Create the listenSocket
+	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (listenSocket == INVALID_SOCKET)
+	{
+		ModuleNetworking::printWSErrorAndExit("[SOCKET]");
+	}
+
 	// - Set address reuse
+	int enable = 1;
+	int iResult = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&enable, sizeof(enable));	
+	if (iResult == SOCKET_ERROR)
+	{
+		ModuleNetworking::printWSErrorAndExit("[SETSOCKOPT]");
+		return false;
+	}
+
 	// - Bind the socket to a local interface
+	sockaddr_in localAddr;
+	localAddr.sin_family = AF_INET; // IPv4
+	localAddr.sin_port = htons(port); // Port
+	localAddr.sin_addr.S_un.S_addr = INADDR_ANY; // Any local IP address
+	iResult = bind(listenSocket, (sockaddr*)&localAddr, sizeof(localAddr));
+	if (iResult == SOCKET_ERROR)
+	{
+		ModuleNetworking::printWSErrorAndExit("[BIND]");
+		return false;
+	}
+
 	// - Enter in listen mode
+	int simultaneousConnections = 1;
+	iResult = listen(listenSocket, simultaneousConnections);
+	if (iResult == SOCKET_ERROR)
+	{
+		ModuleNetworking::printWSErrorAndExit("[LISTEN]");
+		return false;
+	}
+
 	// - Add the listenSocket to the managed list of sockets using addSocket()
+	addSocket(listenSocket);
 
 	state = ServerState::Listening;
 

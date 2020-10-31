@@ -157,6 +157,7 @@ enum { LOG_TYPE_INFO, LOG_TYPE_WARN, LOG_TYPE_ERROR, LOG_TYPE_DEBUG };
 #define DLOG(format, ...) log(__FILE__, __LINE__, LOG_TYPE_DEBUG, format, __VA_ARGS__)
 void log(const char file[], int line, int type, const char* format, ...);
 uint32 getLogEntryCount();
+//void printWSErrorAndExit(const char* msg);
 struct LogEntry {
 	int type;
 	const char *message;

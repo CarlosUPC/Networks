@@ -1,6 +1,6 @@
 #pragma once
 
-
+	
 class ModuleNetworking : public Module
 {
 private:
@@ -40,5 +40,7 @@ protected:
 	void disconnect();
 
 	static void reportError(const char *message);
+
+	static void printWSErrorAndExit(const char* msg);
 };
 
