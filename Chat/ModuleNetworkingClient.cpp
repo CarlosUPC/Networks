@@ -8,8 +8,8 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	// TODO(jesus): TCP connection stuff
 
 	// - Create the socket
-	s = socket(AF_INET, SOCK_STREAM, 0);
-	if (s == INVALID_SOCKET)
+	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (clientSocket == INVALID_SOCKET)
 	{
 		ModuleNetworking::printWSErrorAndExit("[SOCKET]");
 		return false;
@@ -28,7 +28,7 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	}
 
 	// - Connect to the remote address
-	iResult = connect(s, (sockaddr*)&serverAddress, sizeof(serverAddress));
+	iResult = connect(clientSocket, (sockaddr*)&serverAddress, sizeof(serverAddress));
 	if (iResult == SOCKET_ERROR)
 	{
 		ModuleNetworking::printWSErrorAndExit("[CONNECT]");
@@ -36,7 +36,7 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	}
 
 	// - Add the created socket to the managed list of sockets using addSocket()
-	addSocket(s);
+	addSocket(clientSocket);
 
 	// If everything was ok... change the state
 	state = ClientState::Start;
@@ -51,12 +51,23 @@ bool ModuleNetworkingClient::isRunning() const
 
 bool ModuleNetworkingClient::update()
 {
+	bool ret = true;
 	if (state == ClientState::Start)
 	{
 		// TODO(jesus): Send the player name to the server
+		int iResult = send(clientSocket, playerName.c_str(), playerName.size() + 1, 0);
+		if (iResult == SOCKET_ERROR)
+		{
+			ModuleNetworking::printWSErrorAndExit("[CLIENT ERROR]: Error sending playername to server");
+			state = ClientState::Stopped;
+			ret = false;
+		}
+		else {
+			state = ClientState::Logging;
+		}
 	}
 
-	return true;
+	return ret;
 }
 
 bool ModuleNetworkingClient::gui()

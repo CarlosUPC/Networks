@@ -73,6 +73,19 @@ bool ModuleNetworking::preUpdate()
 	byte incomingDataBuffer[incomingDataBufferSize];
 
 	// TODO(jesus): select those sockets that have a read operation available
+	fd_set socketSet;
+	socketSet.fd_count = sockets.size();
+	memcpy(socketSet.fd_array, &sockets, sockets.size() * sizeof(SOCKET));
+
+	TIMEVAL timeout;
+	timeout.tv_sec = 0;
+	timeout.tv_usec = 0;
+
+	int res = select(0, &socketSet, nullptr, nullptr, &timeout);
+	if (res == SOCKET_ERROR) 
+	{
+		ModuleNetworking::printWSErrorAndExit("[NETWORKING ERROR]: Select read sockets");
+	}
 
 	// TODO(jesus): for those sockets selected, check wheter or not they are
 	// a listen socket or a standard socket and perform the corresponding
@@ -92,6 +105,68 @@ bool ModuleNetworking::preUpdate()
 
 	// TODO(jesus): Finally, remove all disconnected sockets from the list
 	// of managed sockets.
+
+
+	for (int i = 0; socketSet.fd_count; ++i)
+	{
+		SOCKET s_tmp = socketSet.fd_array[i];
+
+		if (isListenSocket(s_tmp))
+		{
+			sockaddr_in clientAddr;
+			int clientAddrSize = sizeof(clientAddr);
+
+			SOCKET connected = accept(s_tmp, (sockaddr*)&clientAddr, &clientAddrSize);
+
+			if (connected == INVALID_SOCKET)
+			{
+				//ModuleNetworking::printWSErrorAndExit("[NETWORKING ERROR]: Error receiving client connection");
+				ELOG("[NETWORKING ERROR]: Error receiving client connection %d", WSAGetLastError());
+				return false;
+			}
+
+			onSocketConnected(connected, clientAddr);
+			sockets.push_back(connected);
+		}
+		else
+		{
+			int result = recv(s_tmp, (char*)&incomingDataBuffer, incomingDataBufferSize, 0);
+
+			if (result == SOCKET_ERROR) // errors generated from remote socket
+			{
+				ELOG("NETWORKING ERROR: Error receiving connected server messages %d", WSAGetLastError());
+				onSocketDisconnected(s_tmp);
+				for (auto it = sockets.begin(); it != sockets.end(); ++it)
+				{
+					if ((*it) == s_tmp)
+					{
+						sockets.erase(it);
+						break;
+					}
+				}
+				return false;
+			}
+			else if (result == INVALID_SOCKET) // remote socket was disconnected
+			{
+				onSocketDisconnected(s_tmp);
+				for (auto it = sockets.begin(); it != sockets.end(); ++it)
+				{
+					if ((*it) == s_tmp)
+					{
+						sockets.erase(it);
+						break;
+					}
+				}
+				return false;
+			}
+			else
+			{
+				onSocketReceivedData(s_tmp, incomingDataBuffer);
+			}
+		}
+
+	}
+	
 
 	return true;
 }
