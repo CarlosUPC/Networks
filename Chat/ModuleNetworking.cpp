@@ -109,7 +109,7 @@ bool ModuleNetworking::preUpdate()
 	// of managed sockets.
 
 
-	for (int i = 0; socketSet.fd_count; ++i)
+	for (int i = 0; i < socketSet.fd_count; ++i)
 	{
 		SOCKET s_tmp = socketSet.fd_array[i];
 
