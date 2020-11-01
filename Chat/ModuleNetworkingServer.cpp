@@ -15,7 +15,8 @@ bool ModuleNetworkingServer::start(int port)
 	listenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (listenSocket == INVALID_SOCKET)
 	{
-		ModuleNetworking::printWSErrorAndExit("[SOCKET]");
+		ELOG("[SERVER ERROR]: socket creation %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[SOCKET]");
 	}
 
 	// - Set address reuse
@@ -23,7 +24,8 @@ bool ModuleNetworkingServer::start(int port)
 	int iResult = setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, (const char*)&enable, sizeof(enable));	
 	if (iResult == SOCKET_ERROR)
 	{
-		ModuleNetworking::printWSErrorAndExit("[SETSOCKOPT]");
+		ELOG("[SERVER ERROR]: address reuse %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[SETSOCKOPT]");
 		return false;
 	}
 
@@ -35,7 +37,8 @@ bool ModuleNetworkingServer::start(int port)
 	iResult = bind(listenSocket, (sockaddr*)&localAddr, sizeof(localAddr));
 	if (iResult == SOCKET_ERROR)
 	{
-		ModuleNetworking::printWSErrorAndExit("[BIND]");
+		ELOG("[SERVER ERROR]: Bind socket to local interface %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[BIND]");
 		return false;
 	}
 
@@ -44,7 +47,8 @@ bool ModuleNetworkingServer::start(int port)
 	iResult = listen(listenSocket, simultaneousConnections);
 	if (iResult == SOCKET_ERROR)
 	{
-		ModuleNetworking::printWSErrorAndExit("[LISTEN]");
+		ELOG("[SERVER ERROR]: listen mode %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[LISTEN]");
 		return false;
 	}
 

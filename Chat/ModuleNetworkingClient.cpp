@@ -11,7 +11,8 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket == INVALID_SOCKET)
 	{
-		ModuleNetworking::printWSErrorAndExit("[SOCKET]");
+		ELOG("[CLIENT ERROR]: socket creation %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[SOCKET]");
 		return false;
 	}
 
@@ -23,7 +24,8 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	int iResult = inet_pton(AF_INET, toAddrStr, &serverAddress.sin_addr);
 	if (iResult == SOCKET_ERROR)
 	{
-		ModuleNetworking::printWSErrorAndExit("[ADDRESS]");
+		ELOG("[CLIENT ERROR]: remote address Creation %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[ADDRESS]");
 		return false;
 	}
 
@@ -31,7 +33,8 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	iResult = connect(clientSocket, (sockaddr*)&serverAddress, sizeof(serverAddress));
 	if (iResult == SOCKET_ERROR)
 	{
-		ModuleNetworking::printWSErrorAndExit("[CONNECT]");
+		ELOG("[CLIENT ERROR]: connect socket to romete adress %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[CONNECT]");
 		return false;
 	}
 

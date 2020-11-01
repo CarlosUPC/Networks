@@ -1,6 +1,6 @@
 #include "Networks.h"
 #include "ModuleNetworking.h"
-
+#include <algorithm>
 
 static uint8 NumModulesUsingWinsock = 0;
 
@@ -75,7 +75,8 @@ bool ModuleNetworking::preUpdate()
 	// TODO(jesus): select those sockets that have a read operation available
 	fd_set socketSet;
 	socketSet.fd_count = sockets.size();
-	memcpy(socketSet.fd_array, &sockets, sockets.size() * sizeof(SOCKET));
+	memcpy(socketSet.fd_array, &sockets[0], sockets.size() * sizeof(SOCKET));
+	//std::copy(sockets.begin(), sockets.end(), socketSet.fd_array);
 
 	TIMEVAL timeout;
 	timeout.tv_sec = 0;
@@ -84,7 +85,8 @@ bool ModuleNetworking::preUpdate()
 	int res = select(0, &socketSet, nullptr, nullptr, &timeout);
 	if (res == SOCKET_ERROR) 
 	{
-		ModuleNetworking::printWSErrorAndExit("[NETWORKING ERROR]: Select read sockets");
+		ELOG("[NETWORKING ERROR]: select read sockets %d", WSAGetLastError());
+		//ModuleNetworking::printWSErrorAndExit("[NETWORKING ERROR]: Select read sockets");
 	}
 
 	// TODO(jesus): for those sockets selected, check wheter or not they are
@@ -134,7 +136,7 @@ bool ModuleNetworking::preUpdate()
 
 			if (result == SOCKET_ERROR) // errors generated from remote socket
 			{
-				ELOG("NETWORKING ERROR: Error receiving connected server messages %d", WSAGetLastError());
+				ELOG("[NETWORKING ERROR]: Error receiving data from connected sockets %d", WSAGetLastError());
 				onSocketDisconnected(s_tmp);
 				for (auto it = sockets.begin(); it != sockets.end(); ++it)
 				{
@@ -148,6 +150,7 @@ bool ModuleNetworking::preUpdate()
 			}
 			else if (result == INVALID_SOCKET) // remote socket was disconnected
 			{
+				ELOG("[NETWORKING ERROR]: Error receiving data from connected sockets %d", WSAGetLastError());
 				onSocketDisconnected(s_tmp);
 				for (auto it = sockets.begin(); it != sockets.end(); ++it)
 				{
