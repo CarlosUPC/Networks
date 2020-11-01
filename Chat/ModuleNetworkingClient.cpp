@@ -12,7 +12,7 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	if (clientSocket == INVALID_SOCKET)
 	{
 		ELOG("[CLIENT ERROR]: socket creation %d", WSAGetLastError());
-		//ModuleNetworking::printWSErrorAndExit("[SOCKET]");
+		
 		return false;
 	}
 
@@ -25,7 +25,7 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	if (iResult == SOCKET_ERROR)
 	{
 		ELOG("[CLIENT ERROR]: remote address Creation %d", WSAGetLastError());
-		//ModuleNetworking::printWSErrorAndExit("[ADDRESS]");
+		
 		return false;
 	}
 
@@ -34,7 +34,7 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	if (iResult == SOCKET_ERROR)
 	{
 		ELOG("[CLIENT ERROR]: connect socket to romete adress %d", WSAGetLastError());
-		//ModuleNetworking::printWSErrorAndExit("[CONNECT]");
+		
 		return false;
 	}
 
@@ -61,7 +61,7 @@ bool ModuleNetworkingClient::update()
 		int iResult = send(clientSocket, playerName.c_str(), playerName.size() + 1, 0);
 		if (iResult == SOCKET_ERROR)
 		{
-			ModuleNetworking::printWSErrorAndExit("[CLIENT ERROR]: Error sending playername to server");
+			ELOG("[CLIENT ERROR]: Error sending playername to server %d", WSAGetLastError());
 			state = ClientState::Stopped;
 			ret = false;
 		}

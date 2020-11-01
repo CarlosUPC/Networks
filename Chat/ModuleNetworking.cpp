@@ -75,8 +75,8 @@ bool ModuleNetworking::preUpdate()
 	// TODO(jesus): select those sockets that have a read operation available
 	fd_set socketSet;
 	socketSet.fd_count = sockets.size();
-	memcpy(socketSet.fd_array, &sockets[0], sockets.size() * sizeof(SOCKET));
-	//std::copy(sockets.begin(), sockets.end(), socketSet.fd_array);
+	//memcpy(socketSet.fd_array, &sockets[0], sockets.size() * sizeof(SOCKET));
+	std::copy(sockets.begin(), sockets.end(), socketSet.fd_array);
 
 	TIMEVAL timeout;
 	timeout.tv_sec = 0;
@@ -122,7 +122,6 @@ bool ModuleNetworking::preUpdate()
 
 			if (connected == INVALID_SOCKET)
 			{
-				//ModuleNetworking::printWSErrorAndExit("[NETWORKING ERROR]: Error receiving client connection");
 				ELOG("[NETWORKING ERROR]: Error receiving client connection %d", WSAGetLastError());
 				return false;
 			}

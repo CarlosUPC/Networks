@@ -16,7 +16,7 @@ bool ModuleNetworkingServer::start(int port)
 	if (listenSocket == INVALID_SOCKET)
 	{
 		ELOG("[SERVER ERROR]: socket creation %d", WSAGetLastError());
-		//ModuleNetworking::printWSErrorAndExit("[SOCKET]");
+		
 	}
 
 	// - Set address reuse
@@ -38,7 +38,7 @@ bool ModuleNetworkingServer::start(int port)
 	if (iResult == SOCKET_ERROR)
 	{
 		ELOG("[SERVER ERROR]: Bind socket to local interface %d", WSAGetLastError());
-		//ModuleNetworking::printWSErrorAndExit("[BIND]");
+		
 		return false;
 	}
 
@@ -48,7 +48,7 @@ bool ModuleNetworkingServer::start(int port)
 	if (iResult == SOCKET_ERROR)
 	{
 		ELOG("[SERVER ERROR]: listen mode %d", WSAGetLastError());
-		//ModuleNetworking::printWSErrorAndExit("[LISTEN]");
+		
 		return false;
 	}
 
