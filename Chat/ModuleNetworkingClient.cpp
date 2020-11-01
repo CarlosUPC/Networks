@@ -6,10 +6,37 @@ bool  ModuleNetworkingClient::start(const char * serverAddressStr, int serverPor
 	playerName = pplayerName;
 
 	// TODO(jesus): TCP connection stuff
+
 	// - Create the socket
+	s = socket(AF_INET, SOCK_STREAM, 0);
+	if (s == INVALID_SOCKET)
+	{
+		ModuleNetworking::printWSErrorAndExit("[SOCKET]");
+		return false;
+	}
+
 	// - Create the remote address object
+	//sockaddr_in toAddr;
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_port = htons(serverPort);
+	const char* toAddrStr = serverAddressStr;
+	int iResult = inet_pton(AF_INET, toAddrStr, &serverAddress.sin_addr);
+	if (iResult == SOCKET_ERROR)
+	{
+		ModuleNetworking::printWSErrorAndExit("[ADDRESS]");
+		return false;
+	}
+
 	// - Connect to the remote address
+	iResult = connect(s, (sockaddr*)&serverAddress, sizeof(serverAddress));
+	if (iResult == SOCKET_ERROR)
+	{
+		ModuleNetworking::printWSErrorAndExit("[CONNECT]");
+		return false;
+	}
+
 	// - Add the created socket to the managed list of sockets using addSocket()
+	addSocket(s);
 
 	// If everything was ok... change the state
 	state = ClientState::Start;
