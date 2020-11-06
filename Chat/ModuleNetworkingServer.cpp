@@ -169,6 +169,26 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				//connectedSocket.playerName = (const char *)packet.GetBufferPtr();
 				connectedSocket.playerName = playerName;
 
+				//Notify everyone a new client has been connected
+				OutputMemoryStream outPacketConnection;
+				outPacketConnection << ServerMessage::Notification;
+				outPacketConnection << playerName + " joined";
+
+				for (auto& s : connectedSockets)
+				{
+					if (s.socket == socket)
+						continue;
+
+					if (ModuleNetworking::sendPacket(outPacketConnection, socket))
+					{
+						LOG("Welcome message send to connected client");
+					}
+					else
+					{
+						ELOG("[SERVER ERROR]: error sending Notifiaction message to connected client");
+					}
+				}
+
 				//Send Welcome to client
 				OutputMemoryStream outPacket;
 				outPacket << ServerMessage::Welcome;
@@ -183,6 +203,10 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					ELOG("[SERVER ERROR]: error sending Welcome message to connected client");
 				}
 			}
+			//else
+			//{
+			//	//Send JOINED Message to all the other clients
+			//}
 		}
 	}
 	else if (clientMessage == ClientMessage::Typewrite)
@@ -191,23 +215,66 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		packet >> msg.playerName;
 		packet >> msg.message;
 
-		OutputMemoryStream outPacket;
-		outPacket << ServerMessage::Typewrite;
-		outPacket << msg.playerName;
-		outPacket << msg.message;
-
-		for (auto& connectedSocket : connectedSockets)
+		if (msg.message[0] != '/')
 		{
-			if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
-			{
-				LOG("Typing message send to connected clients");
-			}
-			else
-			{
-				ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+			OutputMemoryStream outPacket;
+			outPacket << ServerMessage::Typewrite;
+			outPacket << msg.playerName;
+			outPacket << msg.message;
 
+			for (auto& connectedSocket : connectedSockets)
+			{
+				if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+				{
+					LOG("Typing message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+
+				}
 			}
 		}
+		else
+		{	
+			// ------- SPECIAL COMMANDS ------- //
+
+			// - Help
+			if (msg.message == "/help")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Notification;
+				outPacket << "No commands available, peepoSad :(";
+
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("Typing message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+
+				}
+			}
+			// - No available command
+			else 
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Notification;
+				outPacket << msg.message + " is not an available command";
+
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("Typing message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+
+				}
+			}
+		}
+
 
 	}
 }
