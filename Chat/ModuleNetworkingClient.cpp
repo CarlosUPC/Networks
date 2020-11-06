@@ -119,6 +119,10 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	{
 		LOG("Welcome received from the server");
 	}
+	else if(serverMessage == ServerMessage::PlayerNameUnavailable)
+	{
+		LOG("Non-Welcome received from the server");
+	}
 	else
 	{
 		LOG("data not received from the server");

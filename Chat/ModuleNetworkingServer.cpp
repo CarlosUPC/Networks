@@ -140,6 +140,27 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		std::string playerName;
 		packet >> playerName;
 
+		for (auto& connectedSocket : connectedSockets)
+		{
+			if (connectedSocket.playerName == playerName)
+			{
+				//Sending Non-Welcome message to client
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::PlayerNameUnavailable;
+
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("Non-Welcome message send to connected client");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending Non-Welcome message to connected client");
+				}
+
+				return;
+			}
+		}
+
 		// Set the player name of the corresponding connected socket proxy
 		for (auto &connectedSocket : connectedSockets)
 		{
