@@ -179,7 +179,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					if (s.socket == socket)
 						continue;
 
-					if (ModuleNetworking::sendPacket(outPacketConnection, socket))
+					if (ModuleNetworking::sendPacket(outPacketConnection, s.socket))
 					{
 						LOG("Welcome message send to connected client");
 					}
@@ -287,8 +287,28 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 		auto &connectedSocket = *it;
 		if (connectedSocket.socket == socket)
 		{
+			//Notify everyone client has been disconnected
+			OutputMemoryStream outPacketConnection;
+			outPacketConnection << ServerMessage::Notification;
+			outPacketConnection << connectedSocket.playerName + " left";
+
+			for (auto& s : connectedSockets)
+			{
+				if (s.socket == socket)
+					continue;
+
+				if (ModuleNetworking::sendPacket(outPacketConnection, socket))
+				{
+					LOG("Welcome message send to connected client");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending Notifiaction message to connected client");
+				}
+			}
+
 			connectedSockets.erase(it);
-			break;
+			return;
 		}
 	}
 }
