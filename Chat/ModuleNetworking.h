@@ -29,6 +29,7 @@ private:
 
 	virtual void onSocketDisconnected(SOCKET s) = 0;
 
+	static bool onSocketSendData(const OutputMemoryStream& packet, SOCKET socket); // At the moment it would be static method to avoid issues with parent polimorfing issues
 
 protected:
 

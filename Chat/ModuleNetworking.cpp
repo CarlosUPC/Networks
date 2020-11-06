@@ -196,6 +196,17 @@ bool ModuleNetworking::cleanUp()
 	return true;
 }
 
+bool ModuleNetworking::onSocketSendData(const OutputMemoryStream& packet, SOCKET socket)
+{
+	int result = send(socket, packet.GetBufferPtr(), packet.GetSize(), 0);
+	if (result == SOCKET_ERROR)
+	{
+		ModuleNetworking::reportError("send");
+		return false;
+	}
+	return true;
+}
+
 void ModuleNetworking::addSocket(SOCKET socket)
 {
 	sockets.push_back(socket);
