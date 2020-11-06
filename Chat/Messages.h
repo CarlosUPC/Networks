@@ -5,12 +5,14 @@
 
 enum class ClientMessage
 {
-	Hello
+	Hello,
+	Typewrite
 };
 
 enum class ServerMessage
 {
 	Welcome,
-	PlayerNameUnavailable
+	PlayerNameUnavailable,
+	Typewrite
 };
 

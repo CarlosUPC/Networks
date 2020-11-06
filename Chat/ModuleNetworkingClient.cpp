@@ -102,6 +102,19 @@ bool ModuleNetworkingClient::gui()
 
 		ImGui::Text("%s connected to the server...", playerName.c_str());
 
+		char message[1024] = "";
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImGui::SetCursorScreenPos({ ImGui::GetCursorScreenPos().x, windowPos.y + ImGui::GetWindowHeight() - 30 });
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Message:"); ImGui::SameLine();
+		if(ImGui::InputText("##MessageInput", message, 1024, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue))
+		{
+			OutputMemoryStream packet;
+			packet << ClientMessage::Typewrite;
+			packet << message;
+			sendPacket(packet, clientSocket);
+		}
+
 		ImGui::End();
 	}
 
@@ -114,20 +127,31 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 
 	ServerMessage serverMessage;
 	packet >> serverMessage;
+	if (state == ClientState::Start)
+	{
+		if (serverMessage == ServerMessage::Welcome)
+		{
+			LOG("Welcome received from the server");
+		}
+		else if(serverMessage == ServerMessage::PlayerNameUnavailable)
+		{
+			LOG("Non-Welcome received from the server");
+			state = ClientState::Stopped;
+		}
+		else
+		{
+			LOG("data not received from the server");
+			state = ClientState::Stopped;
+			disconnect();
+		}
 
-	if (serverMessage == ServerMessage::Welcome)
-	{
-		LOG("Welcome received from the server");
 	}
-	else if(serverMessage == ServerMessage::PlayerNameUnavailable)
+	else if (state == ClientState::Logging)
 	{
-		LOG("Non-Welcome received from the server");
-	}
-	else
-	{
-		LOG("data not received from the server");
-		state = ClientState::Stopped;
-		disconnect();
+		if (serverMessage == ServerMessage::Typewrite)
+		{
+			//TOD: Store all messages to display them with imgui
+		}
 	}
 }
 
