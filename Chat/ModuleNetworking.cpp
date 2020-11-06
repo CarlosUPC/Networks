@@ -69,8 +69,9 @@ bool ModuleNetworking::preUpdate()
 	if (sockets.empty()) return true;
 
 	// NOTE(jesus): You can use this temporary buffer to store data from recv()
-	const uint32 incomingDataBufferSize = Kilobytes(1);
-	byte incomingDataBuffer[incomingDataBufferSize];
+
+	//const uint32 incomingDataBufferSize = Kilobytes(1);
+	//byte incomingDataBuffer[incomingDataBufferSize];
 
 	// TODO(jesus): select those sockets that have a read operation available
 	fd_set socketSet;
@@ -131,7 +132,9 @@ bool ModuleNetworking::preUpdate()
 		}
 		else
 		{
-			int result = recv(s_tmp, (char*)&incomingDataBuffer, incomingDataBufferSize, 0);
+			InputMemoryStream packet;
+			int result = recv(s_tmp, packet.GetBufferPtr(), packet.GetCapacity(), 0);
+			//int result = recv(s_tmp, (char*)&incomingDataBuffer, incomingDataBufferSize, 0);
 
 			if (result == SOCKET_ERROR) // errors generated from remote socket
 			{
@@ -163,7 +166,9 @@ bool ModuleNetworking::preUpdate()
 			}
 			else
 			{
-				onSocketReceivedData(s_tmp, incomingDataBuffer);
+				//onSocketReceivedData(s_tmp, incomingDataBuffer);
+				packet.SetSize((uint32)result);
+				onSocketReceivedData(s_tmp, packet);
 			}
 		}
 
