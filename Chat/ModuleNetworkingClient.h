@@ -2,6 +2,12 @@
 
 #include "ModuleNetworking.h"
 
+struct Message
+{
+	std::string playerName;
+	std::string message;
+};
+
 class ModuleNetworkingClient : public ModuleNetworking
 {
 public:
@@ -55,5 +61,6 @@ private:
 	SOCKET clientSocket = INVALID_SOCKET;
 
 	std::string playerName;
+	std::vector<Message> messages;
 };
 

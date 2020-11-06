@@ -185,6 +185,31 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			}
 		}
 	}
+	else if (clientMessage == ClientMessage::Typewrite)
+	{
+		Message msg;
+		packet >> msg.playerName;
+		packet >> msg.message;
+
+		OutputMemoryStream outPacket;
+		outPacket << ServerMessage::Typewrite;
+		outPacket << msg.playerName;
+		outPacket << msg.message;
+
+		for (auto& connectedSocket : connectedSockets)
+		{
+			if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+			{
+				LOG("Typing message send to connected clients");
+			}
+			else
+			{
+				ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+
+			}
+		}
+
+	}
 }
 
 void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
