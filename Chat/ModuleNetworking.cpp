@@ -196,7 +196,7 @@ bool ModuleNetworking::cleanUp()
 	return true;
 }
 
-bool ModuleNetworking::onSocketSendData(const OutputMemoryStream& packet, SOCKET socket)
+bool ModuleNetworking::sendPacket(const OutputMemoryStream& packet, SOCKET socket)
 {
 	int result = send(socket, packet.GetBufferPtr(), packet.GetSize(), 0);
 	if (result == SOCKET_ERROR)

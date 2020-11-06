@@ -130,12 +130,38 @@ void ModuleNetworkingServer::onSocketConnected(SOCKET socket, const sockaddr_in 
 
 void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemoryStream& packet)
 {
-	// Set the player name of the corresponding connected socket proxy
-	for (auto &connectedSocket : connectedSockets)
+	ClientMessage clientMessage;
+	packet >> clientMessage;
+
+	if (clientMessage == ClientMessage::Hello)
 	{
-		if (connectedSocket.socket == socket)
+		LOG("Hello message received from the connected client");
+
+		std::string playerName;
+		packet >> playerName;
+
+		// Set the player name of the corresponding connected socket proxy
+		for (auto &connectedSocket : connectedSockets)
 		{
-			connectedSocket.playerName = (const char *)packet.GetBufferPtr();
+			if (connectedSocket.socket == socket)
+			{
+				//connectedSocket.playerName = (const char *)packet.GetBufferPtr();
+				connectedSocket.playerName = playerName;
+
+				//Send Welcome to client
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Welcome;
+
+				
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("Welcome message send to connected client");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending Welcome message to connected client");
+				}
+			}
 		}
 	}
 }

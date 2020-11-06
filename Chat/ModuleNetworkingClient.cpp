@@ -57,8 +57,24 @@ bool ModuleNetworkingClient::update()
 	bool ret = true;
 	if (state == ClientState::Start)
 	{
+		OutputMemoryStream packet;
+		packet << ClientMessage::Hello;
+		packet << playerName;
+
+		if (ModuleNetworking::sendPacket(packet, clientSocket))
+		{
+			LOG("Hello message send to the server");
+			state = ClientState::Logging;
+		}
+		else {
+			ELOG("[CLIENT ERROR]: Error sending <playerName> & Hello message to server");
+			disconnect();
+			state = ClientState::Stopped;
+		}
+
+
 		// TODO(jesus): Send the player name to the server
-		int iResult = send(clientSocket, playerName.c_str(), playerName.size() + 1, 0);
+		/*int iResult = send(clientSocket, playerName.c_str(), playerName.size() + 1, 0);
 		if (iResult == SOCKET_ERROR)
 		{
 			ELOG("[CLIENT ERROR]: Error sending playername to server %d", WSAGetLastError());
@@ -67,7 +83,7 @@ bool ModuleNetworkingClient::update()
 		}
 		else {
 			state = ClientState::Logging;
-		}
+		}*/
 	}
 
 	return ret;
@@ -94,7 +110,21 @@ bool ModuleNetworkingClient::gui()
 
 void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemoryStream& packet)
 {
-	state = ClientState::Stopped;
+	//state = ClientState::Stopped;
+
+	ServerMessage serverMessage;
+	packet >> serverMessage;
+
+	if (serverMessage == ServerMessage::Welcome)
+	{
+		LOG("Welcome received from the server");
+	}
+	else
+	{
+		LOG("data not received from the server");
+		state = ClientState::Stopped;
+		disconnect();
+	}
 }
 
 void ModuleNetworkingClient::onSocketDisconnected(SOCKET socket)
