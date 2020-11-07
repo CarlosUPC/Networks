@@ -2,12 +2,16 @@
 
 #include "ModuleNetworking.h"
 
+
 struct Message
 {
 	std::string playerName;
 	std::string message;
 	bool notify = false;
 	bool whisper = false;
+
+	//TODO: declare color variable (struct maybe)
+	
 };
 
 class ModuleNetworkingClient : public ModuleNetworking

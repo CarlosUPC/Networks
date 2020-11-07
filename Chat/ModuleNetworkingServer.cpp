@@ -222,6 +222,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			outPacket << msg.playerName;
 			outPacket << msg.message;
 			outPacket << msg.whisper;
+			//outPacket << msg.color;
 
 			for (auto& connectedSocket : connectedSockets)
 			{
@@ -405,7 +406,36 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 			
 					}
+
 				}
+			}
+			else if (msg.message.find("/change_color") != std::string::npos)
+			{
+			//TODO
+				/*"/change_color 1.0 0.0 0.0";
+				std::string r = "1.0";
+				std::string g = "0.0";
+				std::string b = "0.0";
+
+				double r = 1.0;
+				double g = 0.0;
+				double b = 0.0;
+
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::ChangeColorName;
+				outPacket << r << g << b;
+			
+
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("[COMMAND]:</CHANGE_NAME> message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending </CHANGE_NAME> message to connected clients");
+
+				}*/
+
 			}
 			else if (msg.message == "/clear")
 			{
