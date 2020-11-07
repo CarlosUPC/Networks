@@ -372,6 +372,35 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					}
 				}
 			}
+			else if (msg.message.find("/change_name") != std::string::npos)
+			{
+				std::string newPlayerName = msg.message.substr(msg.message.find("/change_name") + 13);
+				
+				for (auto& connectedSocket : connectedSockets)
+				{
+					if (connectedSocket.socket == socket)
+					{
+						connectedSocket.playerName = newPlayerName;
+						
+						OutputMemoryStream outPacket;
+						outPacket << ServerMessage::ChangeName;
+						outPacket << newPlayerName;
+						outPacket << "changed name to " + newPlayerName;
+
+						if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+						{
+							LOG("[COMMAND]:</CHANGE_NAME> message send to connected clients");
+						}
+						else
+						{
+							ELOG("[SERVER ERROR]: error sending </CHANGE_NAME> message to connected clients");
+
+						}
+
+			
+					}
+				}
+			}
 			// - No available command
 			else 
 			{

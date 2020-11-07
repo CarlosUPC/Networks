@@ -197,6 +197,17 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			state = ClientState::Stopped;
 			disconnect();
 		}
+		else if (serverMessage == ServerMessage::ChangeName)
+		{
+			packet >> playerName;
+
+			Message msg;
+			packet >> msg.message;
+			msg.notify = true;
+
+			messages.push_back(msg);
+			
+		}
 		
 		
 	}
