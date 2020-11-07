@@ -209,7 +209,7 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			messages.push_back(msg);
 			
 		}
-		else if (serverMessage == ServerMessage::ChangeColorName)
+		else if (serverMessage == ServerMessage::ChangeColour)
 		{
 			
 		}

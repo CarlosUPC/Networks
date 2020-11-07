@@ -19,7 +19,7 @@ enum class ServerMessage
 	Kick,
 	ChangeName,
 	Clear,
-	ChangeColorName
+	ChangeColour
 	
 };
 

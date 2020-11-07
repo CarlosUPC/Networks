@@ -3,16 +3,31 @@
 #include "ModuleNetworking.h"
 
 
+struct Color
+{
+	double red = 0.0;
+	double green = 0.0;
+	double blue = 0.0;
+
+};
+
 struct Message
 {
 	std::string playerName;
+	Color color = { (0.0), (0.0), (0.0) };
 	std::string message;
 	bool notify = false;
 	bool whisper = false;
 
+
+	
+
 	//TODO: declare color variable (struct maybe)
 	
 };
+
+
+
 
 class ModuleNetworkingClient : public ModuleNetworking
 {
