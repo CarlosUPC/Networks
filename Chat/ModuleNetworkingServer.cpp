@@ -245,7 +245,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			{
 				OutputMemoryStream outPacket;
 				outPacket << ServerMessage::Notification;
-				std::string help_text("/help\nAvailable Commands:\n/whisper playerName message");
+				std::string help_text("Available Commands:\n/help: to list all available commands.\n/list: to list all users in the chat room.\n/kick: to ban some other user from the chat.\n/whisper: to send a message only to one user.\n/change_name: to change your username.");
 				outPacket << help_text;
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
@@ -256,6 +256,54 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				{
 					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
 
+				}
+			}
+			else if (msg.message == "/list")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Notification;
+
+				std::string message = "Connected Users:";
+				for (auto& connectedSocket : connectedSockets)
+				{
+					message += "\n- " + connectedSocket.playerName;
+				}
+				outPacket << message;
+
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("[COMMAND]: </LIST> message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending </LIST> message to connected clients");
+
+				}
+				
+			}
+			else if (msg.message.find("/kick") != std::string::npos)
+			{
+				std::string playerName = msg.message.substr(msg.message.find("/kick") + 6);
+
+				for (auto& connectedSocket : connectedSockets)
+				{
+					if (connectedSocket.playerName == playerName)
+					{
+						OutputMemoryStream outPacket;
+						outPacket << ServerMessage::Kick;
+
+						if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+						{
+							LOG("[COMMAND]:</KICK> message send to connected clients");
+						}
+						else
+						{
+							ELOG("[SERVER ERROR]: error sending </KICK> message to connected clients");
+
+						}
+
+						onSocketDisconnected(connectedSocket.socket);
+					}
 				}
 			}
 			else if (msg.message.find("/whisper") != std::string::npos)

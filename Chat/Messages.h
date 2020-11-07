@@ -15,6 +15,6 @@ enum class ServerMessage
 	PlayerNameUnavailable,
 	Typewrite,
 	Notification,
-	Disconnection
+	Kick
 };
 

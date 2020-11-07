@@ -191,7 +191,7 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 
 			messages.push_back(msg);
 		}
-		else if (serverMessage == ServerMessage::Disconnection)
+		else if (serverMessage == ServerMessage::Kick)
 		{
 			messages.clear();
 			state = ClientState::Stopped;
