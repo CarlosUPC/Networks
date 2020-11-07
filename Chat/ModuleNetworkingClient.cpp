@@ -148,9 +148,10 @@ bool ModuleNetworkingClient::gui()
 void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemoryStream& packet)
 {
 	//state = ClientState::Stopped;
-
+	
 	ServerMessage serverMessage;
 	packet >> serverMessage;
+
 	if (state == ClientState::Start)
 	{
 		if (serverMessage == ServerMessage::Welcome)
@@ -196,6 +197,8 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			state = ClientState::Stopped;
 			disconnect();
 		}
+		
+		
 	}
 }
 

@@ -148,9 +148,9 @@ bool ModuleNetworking::preUpdate()
 						break;
 					}
 				}
-				return false;
+				//return false;
 			}
-			else if (result == INVALID_SOCKET) // remote socket was disconnected
+			else if (result == 0) // remote socket was disconnected
 			{
 				ELOG("[NETWORKING ERROR]: Error receiving data from connected sockets %d", WSAGetLastError());
 				onSocketDisconnected(s_tmp);
@@ -162,7 +162,7 @@ bool ModuleNetworking::preUpdate()
 						break;
 					}
 				}
-				return false;
+				//return false;
 			}
 			else
 			{
