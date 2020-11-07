@@ -253,7 +253,8 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				"/kick [username]\n"
 				"/whisper [username] [message]\n"
 					"/change_name [username]\n"
-					"/clear";
+					"/clear\n"
+					"/change_color [r] [g] [b]";
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
 				{
