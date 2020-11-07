@@ -221,6 +221,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			outPacket << ServerMessage::Typewrite;
 			outPacket << msg.playerName;
 			outPacket << msg.message;
+			outPacket << msg.whisper;
 
 			for (auto& connectedSocket : connectedSockets)
 			{
@@ -244,7 +245,8 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			{
 				OutputMemoryStream outPacket;
 				outPacket << ServerMessage::Notification;
-				outPacket << "No commands available, peepoSad :(";
+				std::string help_text("/help\nAvailable Commands:\n/whisper playerName message");
+				outPacket << help_text;
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
 				{
@@ -254,6 +256,72 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				{
 					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
 
+				}
+			}
+			else if (msg.message.find("/whisper") != std::string::npos)
+			{
+				std::string nameAndMessage = msg.message.substr(msg.message.find("/whisper") + 9);
+				int nameEnd = nameAndMessage.find(" ");
+				if (nameEnd != std::string::npos)
+				{
+					std::string name = nameAndMessage.substr(0, nameEnd);
+					std::string message = nameAndMessage.substr(nameEnd + 1);
+
+					bool found = false;
+					for (auto& connectedSocket : connectedSockets)
+					{
+						if (connectedSocket.playerName == name)
+						{
+							found = true;
+
+							OutputMemoryStream outPacket;
+							outPacket << ServerMessage::Typewrite;
+							outPacket << msg.playerName;
+							outPacket << message;
+							outPacket << true;
+
+							//Sending message to whispered user
+							if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+							{
+								LOG("</Wisper> message send to connected clients");
+							}
+							else
+							{
+								ELOG("[SERVER ERROR]: error sending </Wisper> message to connected clients");
+
+							}
+
+							//Sending message to whisperer user
+							if (connectedSocket.socket != socket)
+							{
+								if (ModuleNetworking::sendPacket(outPacket, socket))
+								{
+									LOG("</Wisper> message send to connected clients");
+								}
+								else
+								{
+									ELOG("[SERVER ERROR]: error sending </Wisper> message to connected clients");
+
+								}
+							}
+						}
+					}
+					if (!found)
+					{
+						OutputMemoryStream outPacket;
+						outPacket << ServerMessage::Notification;
+						outPacket << "USER NOT FOUND";
+
+						if (ModuleNetworking::sendPacket(outPacket, socket))
+						{
+							LOG("Typing message send to connected clients");
+						}
+						else
+						{
+							ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+
+						}
+					}
 				}
 			}
 			// - No available command
@@ -297,7 +365,7 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 				if (s.socket == socket)
 					continue;
 
-				if (ModuleNetworking::sendPacket(outPacketConnection, socket))
+				if (ModuleNetworking::sendPacket(outPacketConnection, s.socket))
 				{
 					LOG("Welcome message send to connected client");
 				}

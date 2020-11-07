@@ -104,10 +104,16 @@ bool ModuleNetworkingClient::gui()
 
 		for (Message msg : messages)
 		{
-			if(msg.notify)
+			if (msg.notify)
 				ImGui::TextColored({ 1,1,0,1 }, "\"%s\".", msg.message.data());
 			else
-				ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+			{
+				if(msg.whisper)
+					ImGui::TextColored({ 0.55,0.62,0.7,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
+				else
+					ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+
+			}
 		}
 
 		char message[1024] = "";
@@ -125,6 +131,7 @@ bool ModuleNetworkingClient::gui()
 			packet << ClientMessage::Typewrite;
 			packet << msg.playerName;
 			packet << msg.message;
+			
 
 			sendPacket(packet, clientSocket);
 
@@ -171,6 +178,7 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			Message msg;
 			packet >> msg.playerName;
 			packet >> msg.message;
+			packet >> msg.whisper;
 
 			messages.push_back(msg);
 		}
@@ -181,6 +189,12 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			msg.notify = true;
 
 			messages.push_back(msg);
+		}
+		else if (serverMessage == ServerMessage::Disconnection)
+		{
+			messages.clear();
+			state = ClientState::Stopped;
+			disconnect();
 		}
 	}
 }
