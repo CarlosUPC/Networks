@@ -6,7 +6,8 @@
 enum class ClientMessage
 {
 	Hello,
-	Typewrite
+	Typewrite,
+	
 };
 
 enum class ServerMessage
@@ -16,6 +17,7 @@ enum class ServerMessage
 	Typewrite,
 	Notification,
 	Kick,
-	ChangeName
+	ChangeName,
+	Clear
 };
 

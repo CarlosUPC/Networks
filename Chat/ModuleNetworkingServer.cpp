@@ -245,8 +245,14 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			{
 				OutputMemoryStream outPacket;
 				outPacket << ServerMessage::Notification;
-				std::string help_text("Available Commands:\n/help: to list all available commands.\n/list: to list all users in the chat room.\n/kick: to ban some other user from the chat.\n/whisper: to send a message only to one user.\n/change_name: to change your username.");
-				outPacket << help_text;
+				//std::string help_text("Available Commands:\n/help: to list all available commands.\n/list: to list all users in the chat room.\n/kick: to ban some other user from the chat.\n/whisper: to send a message only to one user.\n/change_name: to change your username.");
+				outPacket << "****************** Commands list *****************\n"
+				"/help\n"
+				"/list\n"
+				"/kick [username]\n"
+				"/whisper [username] [message]\n"
+					"/change_name [username]\n"
+					"/clear";
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
 				{
@@ -399,6 +405,22 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 			
 					}
+				}
+			}
+			else if (msg.message == "/clear")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Clear;
+				//outPacket << "console cleaned";
+
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("[COMMAND]:</CLEAR> message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending </CLEAR> message to connected clients");
+
 				}
 			}
 			// - No available command

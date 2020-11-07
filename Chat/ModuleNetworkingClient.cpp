@@ -208,6 +208,10 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			messages.push_back(msg);
 			
 		}
+		else if (serverMessage == ServerMessage::Clear)
+		{
+			messages.clear();
+		}
 		
 		
 	}
