@@ -5,16 +5,16 @@
 
 struct Color
 {
-	float red = 0.0;
-	float green = 0.0;
-	float blue = 0.0;
+	double red = 1.0;
+	double green = 1.0;
+	double blue = 1.0;
 
 };
 
 struct Message
 {
 	std::string playerName;
-	Color color = { (0.0), (0.0), (0.0) };
+	Color color;
 	std::string message;
 	bool notify = false;
 	bool whisper = false;
@@ -83,5 +83,6 @@ private:
 
 	std::string playerName;
 	std::vector<Message> messages;
+	Color color;
 };
 

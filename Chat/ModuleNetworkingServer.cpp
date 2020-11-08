@@ -1,7 +1,9 @@
 #include "ModuleNetworkingServer.h"
 
 
-
+//#include <iostream>
+#include <string>
+#include <sstream>
 
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingServer public methods
@@ -215,6 +217,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 		Message msg;
 		packet >> msg.playerName;
 		packet >> msg.message;
+		packet >> msg.color.red >> msg.color.green >> msg.color.blue;
 
 		if (msg.message[0] != '/')
 		{
@@ -224,6 +227,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			outPacket << msg.message;
 			outPacket << msg.whisper;
 			//outPacket << msg.color;
+			outPacket << msg.color.red << msg.color.green << msg.color.blue;
 
 			for (auto& connectedSocket : connectedSockets)
 			{
@@ -256,7 +260,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				"/change_name [username]\n"
 				"/change_colour [r] [g] [b]\n"
 				"/clear\n"
-				"/emoji [emojiName]\n"
+				"/emoji [:emojiName]\n"
 				"/elist";
 
 
@@ -415,21 +419,65 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 				}
 			}
-			else if (msg.message.find("/change_color") != std::string::npos)
+			else if (msg.message.find("/change_colour") != std::string::npos)
 			{
 
-			std::string newPlayerColorRed = msg.message.substr(msg.message.find("/change_color") + 13);
-			std::string newPlayerColorGreen = msg.message.substr(msg.message.find("/change_color") + 16);
-			std::string newPlayerColorBlue = msg.message.substr(msg.message.find("/change_color") + 19);
+				std::istringstream total_s(msg.message);
+				std::string sub_s;
+				std::vector<std::string> split_s;
 
-			for (auto& connectedSocket : connectedSockets)
+				while (total_s >> sub_s)
+				{
+					split_s.push_back(sub_s);
+				}
+
+				if (split_s.size() == 4)
+				{
+					double r = std::stod(split_s[1]);
+					double g = std::stod(split_s[2]);
+					double b = std::stod(split_s[3]);
+
+					OutputMemoryStream outPacket;
+					outPacket << ServerMessage::ChangeColour;
+					outPacket << "Color changed";
+					outPacket << r << g << b;
+
+					if (ModuleNetworking::sendPacket(outPacket, socket))
+					{
+						LOG("[COMMAND]:</CHANGE_COLOUR> message send to connected clients");
+					}
+					else
+					{
+						ELOG("[SERVER ERROR]: error sending </CHANGE_COLOUR> message to connected clients");
+
+					}
+				}
+				else
+				{
+					OutputMemoryStream outPacket;
+					outPacket << ServerMessage::Notification;
+					outPacket << msg.message + " is not available color format";
+
+					if (ModuleNetworking::sendPacket(outPacket, socket))
+					{
+						LOG("[COMMAND]:</CHANGE_COLOUR> message send to connected clients");
+					}
+					else
+					{
+						ELOG("[SERVER ERROR]: error sending </CHANGE_COLOUR> message to connected clients");
+
+					}
+				}
+
+			
+			/*for (auto& connectedSocket : connectedSockets)
 			{
 				if (connectedSocket.socket == socket)
 				{
 					
 					
 				}
-			}
+			}*/
 			//TODO
 				/*"/change_color 1.0 0.0 0.0";
 				std::string r = "1.0";

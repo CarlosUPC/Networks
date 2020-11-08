@@ -118,16 +118,11 @@ bool ModuleNetworkingClient::gui()
 					ImGui::Spacing();
 				}
 				else
-
-					ImGui::TextColored({msg.color.red,msg.color.green,msg.color.blue,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
-				//ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
-
 				{
 					if(msg.whisper)
 						ImGui::TextColored({ 0.55,0.55,0.55,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
 					else
-						//ImGui::TextColored({msg.color[0],msg.color[0],msg.color[0],1 }, "%s: %s", msg.playerName.data(), msg.message.data());
-					ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+						ImGui::TextColored({ (float)msg.color.red,(float)msg.color.green,(float)msg.color.blue,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
 				}
 
 
@@ -144,11 +139,13 @@ bool ModuleNetworkingClient::gui()
 			Message msg;
 			msg.message = message;
 			msg.playerName = playerName;
+			msg.color = color;
 
 			OutputMemoryStream packet;
 			packet << ClientMessage::Typewrite;
 			packet << msg.playerName;
 			packet << msg.message;
+			packet << msg.color.red << msg.color.green << msg.color.blue;
 			
 			sendPacket(packet, clientSocket);
 
@@ -198,7 +195,7 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			packet >> msg.playerName;
 			packet >> msg.message;
 			packet >> msg.whisper;
-			//packet >> msg.color;
+			packet >> msg.color.red >> msg.color.green >> msg.color.blue;
 
 			messages.push_back(msg);
 		}
@@ -229,13 +226,18 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 		}
 		else if (serverMessage == ServerMessage::ChangeColour)
 		{
+			
 			Message msg;
+			packet >> msg.message;
+			
+			msg.notify = true;
 
-			packet >> msg.color.red;
-			packet >> msg.color.green;
-			packet >> msg.color.blue;
+			packet >> color.red  >> color.green >> color.blue;
+
 
 			messages.push_back(msg);
+
+			
 
 			
 		}
