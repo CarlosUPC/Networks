@@ -157,6 +157,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					ELOG("[SERVER ERROR]: error sending Non-Welcome message to connected client");
 				}
 
+				onSocketDisconnected(socket);
 				return;
 			}
 		}
@@ -181,11 +182,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 					if (ModuleNetworking::sendPacket(outPacketConnection, s.socket))
 					{
-						LOG("Welcome message send to connected client");
+						LOG("Remote client has joined");
 					}
 					else
 					{
-						ELOG("[SERVER ERROR]: error sending Notifiaction message to connected client");
+						ELOG("[SERVER ERROR]: error to Remote client has joined");
 					}
 				}
 
@@ -261,11 +262,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
 				{
-					LOG("Typing message send to connected clients");
+					LOG("[COMMAND]: </HELP> message send to connected clients");
 				}
 				else
 				{
-					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+					ELOG("[SERVER ERROR]: error sending </HELP> message to connected clients");
 
 				}
 			}
@@ -342,11 +343,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 							//Sending message to whispered user
 							if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
 							{
-								LOG("</Wisper> message send to connected clients");
+								LOG("[COMMAND]:</WHISPER> message send to connected clients");
 							}
 							else
 							{
-								ELOG("[SERVER ERROR]: error sending </Wisper> message to connected clients");
+								ELOG("[SERVER ERROR]: error sending </WHISPER> message to connected clients");
 
 							}
 
@@ -355,11 +356,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 							{
 								if (ModuleNetworking::sendPacket(outPacket, socket))
 								{
-									LOG("</Wisper> message send to connected clients");
+									LOG("[COMMAND]:</WHISPER> message send to connected clients");
 								}
 								else
 								{
-									ELOG("[SERVER ERROR]: error sending </Wisper> message to connected clients");
+									ELOG("[SERVER ERROR]: error sending </WHISPER> message to connected clients");
 
 								}
 							}
@@ -373,11 +374,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 						if (ModuleNetworking::sendPacket(outPacket, socket))
 						{
-							LOG("Typing message send to connected clients");
+							LOG("[COMMAND]:</WHISPER> message send to connected clients");
 						}
 						else
 						{
-							ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+							ELOG("[SERVER ERROR]: error sending </WHISPER> message to connected clients");
 
 						}
 					}
@@ -466,11 +467,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 					if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
 					{
-						LOG("Typing message send to connected clients");
+						LOG("[COMMAND]: </EMOJI> message send to connected clients");
 					}
 					else
 					{
-						ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+						ELOG("[SERVER ERROR]: error sending </EMOJI> message to connected clients");
 
 					}
 				}
@@ -495,11 +496,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				
 				if (ModuleNetworking::sendPacket(outPacket, socket))
 				{
-					LOG("[COMMAND]: </LIST> message send to connected clients");
+					LOG("[COMMAND]: </EMOJI LIST> message send to connected clients");
 				}
 				else
 				{
-					ELOG("[SERVER ERROR]: error sending </LIST> message to connected clients");
+					ELOG("[SERVER ERROR]: error sending </EMOJI LIST> message to connected clients");
 
 				}
 
@@ -563,11 +564,11 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 
 				if (ModuleNetworking::sendPacket(outPacketConnection, s.socket))
 				{
-					LOG("Welcome message send to connected client");
+					LOG("Remote client has disconnected");
 				}
 				else
 				{
-					ELOG("[SERVER ERROR]: error sending Notifiaction message to connected client");
+					ELOG("[SERVER ERROR]: error to Remote client has disconnected");
 				}
 			}
 

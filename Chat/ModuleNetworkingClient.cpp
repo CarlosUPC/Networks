@@ -64,7 +64,7 @@ bool ModuleNetworkingClient::update()
 		if (ModuleNetworking::sendPacket(packet, clientSocket))
 		{
 			LOG("Hello message send to the server");
-			state = ClientState::Logging;
+			state = ClientState::Waiting;
 		}
 		else {
 			ELOG("[CLIENT ERROR]: Error sending <playerName> & Hello message to server");
@@ -164,11 +164,12 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 	ServerMessage serverMessage;
 	packet >> serverMessage;
 
-	if (state == ClientState::Start)
+	if (state == ClientState::Waiting)
 	{
 		if (serverMessage == ServerMessage::Welcome)
 		{
 			LOG("Welcome received from the server");
+			state = ClientState::Logging;
 		}
 		else if(serverMessage == ServerMessage::PlayerNameUnavailable)
 		{
@@ -266,6 +267,11 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 			else if (msg.message == ":monkaspeepo")
 			{
 				msg.emoji = App->modResources->monkaspeepo;
+			}
+			else
+			{
+				msg.message = msg.message + std::string(" emoji doesn't exist");
+				msg.notify = true;
 			}
 			
 			messages.push_back(msg);
