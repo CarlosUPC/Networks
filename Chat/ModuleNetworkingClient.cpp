@@ -111,8 +111,8 @@ bool ModuleNetworkingClient::gui()
 				if(msg.whisper)
 					ImGui::TextColored({ 0.55,0.55,0.55,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
 				else
-					//ImGui::TextColored({msg.color[0],msg.color[0],msg.color[0],1 }, "%s: %s", msg.playerName.data(), msg.message.data());
-				ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+					ImGui::TextColored({msg.color.red,msg.color.green,msg.color.blue,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
+				//ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
 
 			}
 		}
@@ -211,6 +211,14 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 		}
 		else if (serverMessage == ServerMessage::ChangeColour)
 		{
+			Message msg;
+
+			packet >> msg.color.red;
+			packet >> msg.color.green;
+			packet >> msg.color.blue;
+
+			messages.push_back(msg);
+
 			
 		}
 		else if (serverMessage == ServerMessage::Clear)

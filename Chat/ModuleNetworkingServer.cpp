@@ -253,8 +253,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				"/kick [username]\n"
 				"/whisper [username] [message]\n"
 					"/change_name [username]\n"
-
-					"/change_colour [r] [g] [b]\n"
+					"/change_color [r] [g] [b]\n"
 					"/clear";
 
 				
@@ -418,13 +417,16 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 			else if (msg.message.find("/change_color") != std::string::npos)
 			{
 
-			std::string newPlayerName = msg.message.substr(msg.message.find("/change_color") + 13);
+			std::string newPlayerColorRed = msg.message.substr(msg.message.find("/change_color") + 13);
+			std::string newPlayerColorGreen = msg.message.substr(msg.message.find("/change_color") + 16);
+			std::string newPlayerColorBlue = msg.message.substr(msg.message.find("/change_color") + 19);
 
 			for (auto& connectedSocket : connectedSockets)
 			{
 				if (connectedSocket.socket == socket)
 				{
-
+					
+					
 				}
 			}
 			//TODO

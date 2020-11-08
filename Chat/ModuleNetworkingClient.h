@@ -5,9 +5,9 @@
 
 struct Color
 {
-	double red = 0.0;
-	double green = 0.0;
-	double blue = 0.0;
+	float red = 0.0;
+	float green = 0.0;
+	float blue = 0.0;
 
 };
 

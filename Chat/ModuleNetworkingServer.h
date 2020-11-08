@@ -2,6 +2,8 @@
 
 #include "ModuleNetworking.h"
 
+
+
 class ModuleNetworkingServer : public ModuleNetworking
 {
 public:
@@ -61,6 +63,7 @@ private:
 		sockaddr_in address;
 		SOCKET socket;
 		std::string playerName;
+	
 	};
 
 	std::vector<ConnectedSocket> connectedSockets;
