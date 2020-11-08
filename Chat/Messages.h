@@ -20,7 +20,6 @@ enum class ServerMessage
 	ChangeName,
 	Clear,
 	ChangeColour,
-	ChangeColorName,
 	Emoji
 
 	

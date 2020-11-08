@@ -254,9 +254,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				"/whisper [username] [message]\n"
 				"/change_name [username]\n"
 				"/change_colour [r] [g] [b]\n"
-				"/clear";
 				"/clear\n"
-				"/change_color [r] [g] [b]\n"
 				"/emoji [emojiName]\n"
 				"/elist";
 
