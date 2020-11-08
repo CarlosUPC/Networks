@@ -306,6 +306,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				{
 					if (connectedSocket.playerName == playerName)
 					{
+
 						OutputMemoryStream outPacket;
 						outPacket << ServerMessage::Kick;
 
@@ -319,9 +320,43 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 						}
 
+						for (auto& s : connectedSockets)
+						{
+							if (s.socket == connectedSocket.socket)
+								continue;
+
+							OutputMemoryStream outPacketConnection;
+							outPacketConnection << ServerMessage::Notification;
+							outPacketConnection << connectedSocket.playerName + " was kicked by " + msg.playerName;
+
+							ModuleNetworking::sendPacket(outPacketConnection, s.socket);
+							
+						}
 						onSocketDisconnected(connectedSocket.socket);
+
 					}
+					
 				}
+
+				/*for (auto& connectedSocket : connectedSockets)
+				{
+						OutputMemoryStream outPacket;
+						outPacket << ServerMessage::Notification;
+						outPacket << playerName + " was kicked";
+
+						if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+						{
+							LOG("[COMMAND]:</KICK> message send to connected clients");
+						}
+						else
+						{
+							ELOG("[SERVER ERROR]: error sending </KICK> message to connected clients");
+
+						}
+			
+				}*/
+				
+
 			}
 			else if (msg.message.find("/whisper") != std::string::npos)
 			{
@@ -344,6 +379,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 							outPacket << msg.playerName;
 							outPacket << message;
 							outPacket << true;
+							outPacket << msg.color.red << msg.color.green << msg.color.blue;
 
 							//Sending message to whispered user
 							if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
@@ -468,40 +504,6 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 					}
 				}
-
-			
-			/*for (auto& connectedSocket : connectedSockets)
-			{
-				if (connectedSocket.socket == socket)
-				{
-					
-					
-				}
-			}*/
-			//TODO
-				/*"/change_color 1.0 0.0 0.0";
-				std::string r = "1.0";
-				std::string g = "0.0";
-				std::string b = "0.0";
-
-				double r = 1.0;
-				double g = 0.0;
-				double b = 0.0;
-
-				OutputMemoryStream outPacket;
-				outPacket << ServerMessage::ChangeColorName;
-				outPacket << r << g << b;
-			
-
-				if (ModuleNetworking::sendPacket(outPacket, socket))
-				{
-					LOG("[COMMAND]:</CHANGE_NAME> message send to connected clients");
-				}
-				else
-				{
-					ELOG("[SERVER ERROR]: error sending </CHANGE_NAME> message to connected clients");
-
-				}*/
 
 			}
 			else if (msg.message.find("/emoji") != std::string::npos)
