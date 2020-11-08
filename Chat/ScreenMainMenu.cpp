@@ -17,6 +17,9 @@ void ScreenMainMenu::gui()
 	ImVec2 bannerSize(400.0f, 400.0f * banner->height / banner->width);
 	ImGui::Image(banner->shaderResource, bannerSize);
 
+	
+
+
 	ImGui::Spacing();
 
 	ImGui::Text("Server");

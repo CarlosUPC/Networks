@@ -108,11 +108,23 @@ bool ModuleNetworkingClient::gui()
 				ImGui::TextColored({ 1,1,0,1 }, "\"%s\".", msg.message.data());
 			else
 			{
-				if(msg.whisper)
-					ImGui::TextColored({ 0.55,0.55,0.55,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
+				if (msg.emoji != nullptr)
+				{
+					ImVec2 emojiSize(50.0f, 50.0f);
+					ImGui::Text("%s: ", msg.playerName.data());
+					
+					//ImGui::SameLine();
+					ImGui::Image(msg.emoji->shaderResource, emojiSize);
+					ImGui::Spacing();
+				}
 				else
-					//ImGui::TextColored({msg.color[0],msg.color[0],msg.color[0],1 }, "%s: %s", msg.playerName.data(), msg.message.data());
-				ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+				{
+					if(msg.whisper)
+						ImGui::TextColored({ 0.55,0.55,0.55,1 }, "%s: %s", msg.playerName.data(), msg.message.data());
+					else
+						//ImGui::TextColored({msg.color[0],msg.color[0],msg.color[0],1 }, "%s: %s", msg.playerName.data(), msg.message.data());
+					ImGui::Text("%s: %s", msg.playerName.data(), msg.message.data());
+				}
 
 			}
 		}
@@ -213,8 +225,57 @@ void ModuleNetworkingClient::onSocketReceivedData(SOCKET socket, const InputMemo
 		{
 			
 		}
+		else if (serverMessage == ServerMessage::Emoji)
+		{
+			Message msg;
+			packet >> msg.playerName;
+			packet >> msg.message;
+
+			if (msg.message == ":laughpeepo")
+			{
+				msg.emoji = App->modResources->laughpeepo;
+			}
+			else if (msg.message == ":sadpeepo")
+			{
+				msg.emoji = App->modResources->sadpeepo;
+			}
+			else if (msg.message == ":ezpeepo")
+			{
+				msg.emoji = App->modResources->ezpeepo;
+			}
+			else if (msg.message == ":hypepeepo")
+			{
+				msg.emoji = App->modResources->hypepeepo;
+			}
+			else if (msg.message == ":crosspeepo")
+			{
+				msg.emoji = App->modResources->crosspeepo;
+			}
+			else if (msg.message == ":crunchpeepo")
+			{
+				msg.emoji = App->modResources->crunchpeepo;
+			}
+			else if (msg.message == ":clownpeepo")
+			{
+				msg.emoji = App->modResources->clownhpeepo;
+			}
+			else if (msg.message == ":tsmpeepo")
+			{
+				msg.emoji = App->modResources->tsmpeepo;
+			}
+			else if (msg.message == ":monkaspeepo")
+			{
+				msg.emoji = App->modResources->monkaspeepo;
+			}
+			
+			messages.push_back(msg);
+		}
 		else if (serverMessage == ServerMessage::Clear)
 		{
+			for (Message msg : messages)
+			{
+				msg.emoji = nullptr;
+			}
 			messages.clear();
 		}
 		

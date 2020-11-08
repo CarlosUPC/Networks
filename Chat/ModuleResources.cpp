@@ -31,6 +31,18 @@ bool ModuleResources::init()
 	loadTextureAsync("banner.jpg", &banner);
 	loadTextureAsync("client.jpg", &client);
 	loadTextureAsync("server.jpg", &server);
+
+	loadTextureAsync("laughpeepo.png", &laughpeepo);
+	loadTextureAsync("sadpeepo.png", &sadpeepo);
+	loadTextureAsync("crosspeepo.png", &crosspeepo);
+	loadTextureAsync("hypepeepo.png", &hypepeepo);
+	loadTextureAsync("ezpeepo.png", &ezpeepo);
+	loadTextureAsync("monkaspeepo.png", &monkaspeepo);
+	loadTextureAsync("tsmpeepo.png", &tsmpeepo);
+	loadTextureAsync("crunchpeepo.png", &crunchpeepo);
+	loadTextureAsync("clownpeepo.png", &clownhpeepo);
+	
+
 #endif
 
 	return true;

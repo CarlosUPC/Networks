@@ -252,13 +252,13 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				"/list\n"
 				"/kick [username]\n"
 				"/whisper [username] [message]\n"
-					"/change_name [username]\n"
-
-					"/change_colour [r] [g] [b]\n"
-					"/clear";
-
-				
-					
+				"/change_name [username]\n"
+				"/change_colour [r] [g] [b]\n"
+				"/clear";
+				"/clear\n"
+				"/change_color [r] [g] [b]\n"
+				"/emoji [emojiName]\n"
+				"/elist";
 
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
@@ -451,6 +451,59 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					ELOG("[SERVER ERROR]: error sending </CHANGE_NAME> message to connected clients");
 
 				}*/
+
+			}
+			else if (msg.message.find("/emoji") != std::string::npos)
+			{
+				std::string emojiName = msg.message.substr(msg.message.find("/emoji") + 7);
+				
+
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Emoji;
+				outPacket << msg.playerName;
+				outPacket << emojiName;
+
+				for (auto& connectedSocket : connectedSockets)
+				{
+
+					if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+					{
+						LOG("Typing message send to connected clients");
+					}
+					else
+					{
+						ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+
+					}
+				}
+
+			}
+			else if (msg.message == "/elist")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Notification;
+
+				outPacket << "****************** Emoji list *****************\n"
+					":sadpeepo\n"
+					":laughpeepo\n"
+					":ezpeepo\n"
+					":hypepeepo\n"
+					":clownpeepo\n"
+					":monkaspeepo\n"
+					":crosspeepo\n"
+					":tsmpeepo\n"
+					":crunchpeepo";
+
+				
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("[COMMAND]: </LIST> message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending </LIST> message to connected clients");
+
+				}
 
 			}
 			else if (msg.message == "/clear")

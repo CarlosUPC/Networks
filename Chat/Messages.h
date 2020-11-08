@@ -19,7 +19,10 @@ enum class ServerMessage
 	Kick,
 	ChangeName,
 	Clear,
-	ChangeColour
+	ChangeColour,
+	ChangeColorName,
+	Emoji
+
 	
 };
 
