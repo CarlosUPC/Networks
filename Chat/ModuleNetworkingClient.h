@@ -19,8 +19,7 @@ struct Message
 	bool notify = false;
 	bool whisper = false;
 
-
-	
+	Texture* emoji = nullptr;
 
 	//TODO: declare color variable (struct maybe)
 	
@@ -73,6 +72,7 @@ private:
 	{
 		Stopped,
 		Start,
+		Waiting,
 		Logging
 	};
 

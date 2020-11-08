@@ -13,6 +13,16 @@ public:
 	Texture *client = nullptr;
 	Texture *server = nullptr;
 
+	Texture* sadpeepo = nullptr;
+	Texture* hypepeepo = nullptr;
+	Texture* crosspeepo = nullptr;
+	Texture* laughpeepo = nullptr;
+	Texture* crunchpeepo = nullptr;
+	Texture* ezpeepo = nullptr;
+	Texture* monkaspeepo = nullptr;
+	Texture* tsmpeepo = nullptr;
+	Texture* clownhpeepo = nullptr;
+
 	bool finishedLoading = false;
 private:
 

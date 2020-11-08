@@ -157,6 +157,7 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 					ELOG("[SERVER ERROR]: error sending Non-Welcome message to connected client");
 				}
 
+				onSocketDisconnected(socket);
 				return;
 			}
 		}
@@ -181,11 +182,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 					if (ModuleNetworking::sendPacket(outPacketConnection, s.socket))
 					{
-						LOG("Welcome message send to connected client");
+						LOG("Remote client has joined");
 					}
 					else
 					{
-						ELOG("[SERVER ERROR]: error sending Notifiaction message to connected client");
+						ELOG("[SERVER ERROR]: error to Remote client has joined");
 					}
 				}
 
@@ -252,21 +253,21 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				"/list\n"
 				"/kick [username]\n"
 				"/whisper [username] [message]\n"
-					"/change_name [username]\n"
-					"/change_color [r] [g] [b]\n"
-					"/clear";
+				"/change_name [username]\n"
+				"/change_colour [r] [g] [b]\n"
+				"/clear\n"
+				"/emoji [emojiName]\n"
+				"/elist";
 
-				
-					
 
 
 				if (ModuleNetworking::sendPacket(outPacket, socket))
 				{
-					LOG("Typing message send to connected clients");
+					LOG("[COMMAND]: </HELP> message send to connected clients");
 				}
 				else
 				{
-					ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+					ELOG("[SERVER ERROR]: error sending </HELP> message to connected clients");
 
 				}
 			}
@@ -343,11 +344,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 							//Sending message to whispered user
 							if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
 							{
-								LOG("</Wisper> message send to connected clients");
+								LOG("[COMMAND]:</WHISPER> message send to connected clients");
 							}
 							else
 							{
-								ELOG("[SERVER ERROR]: error sending </Wisper> message to connected clients");
+								ELOG("[SERVER ERROR]: error sending </WHISPER> message to connected clients");
 
 							}
 
@@ -356,11 +357,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 							{
 								if (ModuleNetworking::sendPacket(outPacket, socket))
 								{
-									LOG("</Wisper> message send to connected clients");
+									LOG("[COMMAND]:</WHISPER> message send to connected clients");
 								}
 								else
 								{
-									ELOG("[SERVER ERROR]: error sending </Wisper> message to connected clients");
+									ELOG("[SERVER ERROR]: error sending </WHISPER> message to connected clients");
 
 								}
 							}
@@ -374,11 +375,11 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 
 						if (ModuleNetworking::sendPacket(outPacket, socket))
 						{
-							LOG("Typing message send to connected clients");
+							LOG("[COMMAND]:</WHISPER> message send to connected clients");
 						}
 						else
 						{
-							ELOG("[SERVER ERROR]: error sending Typing message to connected clients");
+							ELOG("[SERVER ERROR]: error sending </WHISPER> message to connected clients");
 
 						}
 					}
@@ -455,6 +456,59 @@ void ModuleNetworkingServer::onSocketReceivedData(SOCKET socket, const InputMemo
 				}*/
 
 			}
+			else if (msg.message.find("/emoji") != std::string::npos)
+			{
+				std::string emojiName = msg.message.substr(msg.message.find("/emoji") + 7);
+				
+
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Emoji;
+				outPacket << msg.playerName;
+				outPacket << emojiName;
+
+				for (auto& connectedSocket : connectedSockets)
+				{
+
+					if (ModuleNetworking::sendPacket(outPacket, connectedSocket.socket))
+					{
+						LOG("[COMMAND]: </EMOJI> message send to connected clients");
+					}
+					else
+					{
+						ELOG("[SERVER ERROR]: error sending </EMOJI> message to connected clients");
+
+					}
+				}
+
+			}
+			else if (msg.message == "/elist")
+			{
+				OutputMemoryStream outPacket;
+				outPacket << ServerMessage::Notification;
+
+				outPacket << "****************** Emoji list *****************\n"
+					":sadpeepo\n"
+					":laughpeepo\n"
+					":ezpeepo\n"
+					":hypepeepo\n"
+					":clownpeepo\n"
+					":monkaspeepo\n"
+					":crosspeepo\n"
+					":tsmpeepo\n"
+					":crunchpeepo";
+
+				
+				if (ModuleNetworking::sendPacket(outPacket, socket))
+				{
+					LOG("[COMMAND]: </EMOJI LIST> message send to connected clients");
+				}
+				else
+				{
+					ELOG("[SERVER ERROR]: error sending </EMOJI LIST> message to connected clients");
+
+				}
+
+			}
 			else if (msg.message == "/clear")
 			{
 				OutputMemoryStream outPacket;
@@ -514,11 +568,11 @@ void ModuleNetworkingServer::onSocketDisconnected(SOCKET socket)
 
 				if (ModuleNetworking::sendPacket(outPacketConnection, s.socket))
 				{
-					LOG("Welcome message send to connected client");
+					LOG("Remote client has disconnected");
 				}
 				else
 				{
-					ELOG("[SERVER ERROR]: error sending Notifiaction message to connected client");
+					ELOG("[SERVER ERROR]: error to Remote client has disconnected");
 				}
 			}
 
