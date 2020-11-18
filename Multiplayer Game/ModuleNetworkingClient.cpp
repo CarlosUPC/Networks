@@ -103,7 +103,8 @@ void ModuleNetworkingClient::onGui()
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
 {
 	// TODO(you): UDP virtual connection lab session
-
+	
+	
 	uint32 protoId;
 	packet >> protoId;
 	if (protoId != PROTOCOL_ID) return;
@@ -129,6 +130,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	}
 	else if (state == ClientState::Connected)
 	{
+		lastPacketTime = Time.time;
 		// TODO(you): World state replication lab session
 
 		// TODO(you): Reliability on top of UDP lab session
@@ -142,6 +144,11 @@ void ModuleNetworkingClient::onUpdate()
 
 	// TODO(you): UDP virtual connection lab session
 
+	if (Time.time - lastPacketTime >= DISCONNECT_TIMEOUT_SECONDS)
+	{
+		disconnect();
+		DLOG("Time of last packed timedout");
+	}
 
 	if (state == ClientState::Connecting)
 	{
@@ -158,11 +165,22 @@ void ModuleNetworkingClient::onUpdate()
 			packet << spaceshipType;
 
 			sendPacket(packet, serverAddress);
+
 		}
 	}
 	else if (state == ClientState::Connected)
 	{
 		// TODO(you): UDP virtual connection lab session
+		for (float iter = 0.0f; iter < PING_INTERVAL_SECONDS; ++iter)
+		{
+			OutputMemoryStream packet;
+			packet << PROTOCOL_ID;
+			packet << ClientMessage::Ping;
+
+			sendPacket(packet, serverAddress);
+		}
+		
+
 
 		// Process more inputs if there's space
 		if (inputDataBack - inputDataFront < ArrayCount(inputData))
@@ -176,7 +194,7 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
 		}
 
-		secondsSinceLastInputDelivery += Time.deltaTime;
+
 
 		// Input delivery interval timed out: create a new input packet
 		if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
