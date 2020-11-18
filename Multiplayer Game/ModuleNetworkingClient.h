@@ -86,6 +86,7 @@ private:
 
 	// TODO(you): UDP virtual connection lab session
 
+	double lastPacketTime = 0.0;
 
 
 	//////////////////////////////////////////////////////////////////////
