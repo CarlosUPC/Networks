@@ -51,6 +51,8 @@ void ModuleNetworkingClient::onStart()
 
 	secondsSinceLastHello = 9999.0f;
 	secondsSinceLastInputDelivery = 0.0f;
+
+	lastPacketTime = Time.time;
 }
 
 void ModuleNetworkingClient::onGui()
@@ -103,7 +105,7 @@ void ModuleNetworkingClient::onGui()
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
 {
 	// TODO(you): UDP virtual connection lab session
-	
+	lastPacketTime = Time.time;
 	
 	uint32 protoId;
 	packet >> protoId;
@@ -130,7 +132,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	}
 	else if (state == ClientState::Connected)
 	{
-		lastPacketTime = Time.time;
+		//lastPacketTime = Time.time;
 		// TODO(you): World state replication lab session
 
 		// TODO(you): Reliability on top of UDP lab session
@@ -144,12 +146,7 @@ void ModuleNetworkingClient::onUpdate()
 
 	// TODO(you): UDP virtual connection lab session
 
-	if (Time.time - lastPacketTime >= DISCONNECT_TIMEOUT_SECONDS)
-	{
-		disconnect();
-		DLOG("Time of last packed timedout");
-	}
-
+	
 	if (state == ClientState::Connecting)
 	{
 		secondsSinceLastHello += Time.deltaTime;
@@ -176,7 +173,7 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::Ping;
-
+			
 			sendPacket(packet, serverAddress);
 		}
 		
@@ -220,6 +217,12 @@ void ModuleNetworkingClient::onUpdate()
 			inputDataFront = inputDataBack;
 
 			sendPacket(packet, serverAddress);
+		}
+
+		if (Time.time - lastPacketTime >= DISCONNECT_TIMEOUT_SECONDS)
+		{
+			disconnect();
+			DLOG("Time of last packed timedout");
 		}
 
 		// TODO(you): Latency management lab session
