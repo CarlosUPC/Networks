@@ -168,14 +168,33 @@ void ModuleNetworkingClient::onUpdate()
 	else if (state == ClientState::Connected)
 	{
 		// TODO(you): UDP virtual connection lab session
-		for (float iter = 0.0f; iter < PING_INTERVAL_SECONDS; ++iter)
+
+		secondsSinceLastPing += Time.deltaTime;
+
+		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
+		{
+			secondsSinceLastPing = 0.0f;
+
+			OutputMemoryStream packet;
+			packet << PROTOCOL_ID;
+			packet << ClientMessage::Ping;
+
+			sendPacket(packet, serverAddress);
+			DLOG("Client send Ping message");
+
+		}
+
+
+
+
+		/*for (float iter = 0.0f; iter < PING_INTERVAL_SECONDS; ++iter)
 		{
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::Ping;
 			
 			sendPacket(packet, serverAddress);
-		}
+		}*/
 		
 
 
