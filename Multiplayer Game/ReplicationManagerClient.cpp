@@ -38,6 +38,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 		GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 		if (gameObject != nullptr)
 		{
+			App->modLinkingContext->unregisterNetworkGameObject(gameObject);
 			Destroy(gameObject);
 		}
 	}

@@ -9,7 +9,10 @@ void ReplicationManagerServer::create(uint32 networkId)
 	command.action = ReplicationAction::Create;
 	command.networkId = networkId;
 
-	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+
+	if (map.find(networkId) == map.end())
+		map[networkId] = command;
 }
 
 void ReplicationManagerServer::update(uint32 networkId)
@@ -18,7 +21,10 @@ void ReplicationManagerServer::update(uint32 networkId)
 	command.action = ReplicationAction::Update;
 	command.networkId = networkId;
 
-	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+
+	if (map.find(networkId) == map.end())
+		map[networkId] = command;
 }
 
 void ReplicationManagerServer::destroy(uint32 networkId)
@@ -27,7 +33,10 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 	command.action = ReplicationAction::Destroy;
 	command.networkId = networkId;
 
-	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+
+	if (map.find(networkId) == map.end())
+		map[networkId] = command;
 }
 
 
@@ -48,9 +57,12 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(command.networkId);
 
 			//Serialize fields
-			packet << gameObject->position.x;
-			packet << gameObject->position.y;
-			packet << gameObject->angle;
+			if (gameObject != nullptr)
+			{
+				packet << gameObject->position.x;
+				packet << gameObject->position.y;
+				packet << gameObject->angle;
+			}
 		}
 		else if (command.action == ReplicationAction::Update)
 		{
@@ -58,9 +70,12 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(command.networkId);
 
 			//Serialize fields
-			packet << gameObject->position.x;
-			packet << gameObject->position.y;
-			packet << gameObject->angle;
+			if (gameObject != nullptr)
+			{
+				packet << gameObject->position.x;
+				packet << gameObject->position.y;
+				packet << gameObject->angle;
+			}
 
 		}
 		else if (command.action == ReplicationAction::Destroy)
