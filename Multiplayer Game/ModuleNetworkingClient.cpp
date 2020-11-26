@@ -52,7 +52,7 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastHello = 9999.0f;
 	secondsSinceLastInputDelivery = 0.0f;
 
-	lastPacketTime = Time.time;
+	lastPacketReceivedTime = Time.time;
 }
 
 void ModuleNetworkingClient::onGui()
@@ -105,7 +105,7 @@ void ModuleNetworkingClient::onGui()
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
 {
 	// TODO(you): UDP virtual connection lab session
-	lastPacketTime = Time.time;
+	
 	
 	uint32 protoId;
 	packet >> protoId;
@@ -132,7 +132,11 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	}
 	else if (state == ClientState::Connected)
 	{
-		//lastPacketTime = Time.time;
+		if (message == ServerMessage::Ping)
+		{
+			lastPacketReceivedTime = Time.time;
+		}
+		
 		// TODO(you): World state replication lab session
 
 		// TODO(you): Reliability on top of UDP lab session
@@ -171,6 +175,12 @@ void ModuleNetworkingClient::onUpdate()
 
 		secondsSinceLastPing += Time.deltaTime;
 
+		if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
+		{
+			disconnect();
+			DLOG("Time of last packed timedout");
+		}
+
 		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
 		{
 			secondsSinceLastPing = 0.0f;
@@ -183,19 +193,6 @@ void ModuleNetworkingClient::onUpdate()
 			DLOG("Client send Ping message");
 
 		}
-
-
-
-
-		/*for (float iter = 0.0f; iter < PING_INTERVAL_SECONDS; ++iter)
-		{
-			OutputMemoryStream packet;
-			packet << PROTOCOL_ID;
-			packet << ClientMessage::Ping;
-			
-			sendPacket(packet, serverAddress);
-		}*/
-		
 
 
 		// Process more inputs if there's space
@@ -238,11 +235,11 @@ void ModuleNetworkingClient::onUpdate()
 			sendPacket(packet, serverAddress);
 		}
 
-		if (Time.time - lastPacketTime >= DISCONNECT_TIMEOUT_SECONDS)
+		/*if (Time.time - lastPacketTime >= DISCONNECT_TIMEOUT_SECONDS)
 		{
 			disconnect();
 			DLOG("Time of last packed timedout");
-		}
+		}*/
 
 		// TODO(you): Latency management lab session
 
