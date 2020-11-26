@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "ReplicationManagerServer.h"
 
 // TODO(you): World state replication lab session
 
@@ -69,4 +70,9 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 	}
 
 	map.clear(); //With this we are assuming reliability.
+}
+
+bool ReplicationManagerServer::isEmpty() const
+{
+	return map.empty();
 }

@@ -22,7 +22,7 @@ public:
 
 	void write(OutputMemoryStream& packet);
 
-	
+	bool isEmpty() const; 
 
 private:
 	std::unordered_map<uint32, ReplicationCommand> map;
