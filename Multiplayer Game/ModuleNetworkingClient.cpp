@@ -235,12 +235,7 @@ void ModuleNetworkingClient::onUpdate()
 			sendPacket(packet, serverAddress);
 		}
 
-		/*if (Time.time - lastPacketTime >= DISCONNECT_TIMEOUT_SECONDS)
-		{
-			disconnect();
-			DLOG("Time of last packed timedout");
-		}*/
-
+		
 		// TODO(you): Latency management lab session
 
 		// Update camera for player
