@@ -62,6 +62,17 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << gameObject->position.x;
 				packet << gameObject->position.y;
 				packet << gameObject->angle;
+				packet << gameObject->size.x;
+				packet << gameObject->size.y;
+
+				if (gameObject->sprite->texture == App->modResources->spacecraft1)
+					packet << (uint8)1;
+				else if (gameObject->sprite->texture == App->modResources->spacecraft2)
+					packet << (uint8)2;
+				else if (gameObject->sprite->texture == App->modResources->spacecraft3)
+					packet << (uint8)3;
+				else
+					packet << (uint8)0;
 			}
 		}
 		else if (command.action == ReplicationAction::Update)
