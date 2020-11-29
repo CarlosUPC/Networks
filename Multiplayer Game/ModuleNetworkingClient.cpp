@@ -141,6 +141,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		if (message == ServerMessage::Replication)
 		{
 			replicationManager.read(packet);
+			packet >> inputDataFront;
 		}
 		// TODO(you): Reliability on top of UDP lab session
 	}
@@ -233,7 +234,7 @@ void ModuleNetworkingClient::onUpdate()
 			}
 
 			// Clear the queue
-			inputDataFront = inputDataBack;
+			//inputDataFront = inputDataBack;
 
 			sendPacket(packet, serverAddress);
 		}

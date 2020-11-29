@@ -270,6 +270,8 @@ void ModuleNetworkingServer::onUpdate()
 
 					clientProxy.replicationManager.write(packet);
 
+					packet << clientProxy.nextExpectedInputSequenceNumber;
+
 					sendPacket(packet, clientProxy.address);
 					DLOG("Server send Replication packet");
 				}
