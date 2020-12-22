@@ -140,7 +140,16 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		// TODO(you): World state replication lab session
 		if (message == ServerMessage::Replication)
 		{
-			replicationManager.read(packet);
+			if (deliveryManager.processSequenceNumber(packet))
+				replicationManager.read(packet);
+
+			else //Empty the packet without reading the content
+			{
+				char temp;
+				while (packet.RemainingByteCount() > sizeof(uint32))
+					packet >> temp;
+			}
+
 			packet >> inputDataFront;
 		}
 		// TODO(you): Reliability on top of UDP lab session
@@ -192,6 +201,9 @@ void ModuleNetworkingClient::onUpdate()
 			OutputMemoryStream packet;
 			packet << PROTOCOL_ID;
 			packet << ClientMessage::Ping;
+
+			deliveryManager.writeSequenceNumbersPendingAck(packet); //Send ack numbers to server
+
 
 			sendPacket(packet, serverAddress);
 			DLOG("Client send Ping message");

@@ -13,7 +13,7 @@ Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet)
 	delivery->sequenceNumber = nextOutSeqNumber;
 	delivery->dispatchTime = Time.time;
 
-	delivery->delegate = new DeliveryDelegateStandard();
+	delivery->delegate = new DeliveryDelegateDummy();
 
 	pendingDeliveries.push_back(delivery);
 
@@ -97,10 +97,10 @@ void DeliveryManager::processTimedOutPackets()
 			delete delivery;
 			it = pendingDeliveries.erase(it);
 			
-			break;
+			//break;
 
 		}
-		it--;
+		
 	}
 }
 
@@ -113,12 +113,12 @@ void DeliveryManager::clear()
 	pendingAcks.clear();
 }
 
-void DeliveryDelegateStandard::OnDeliverySuccess(DeliveryManager* delManager)
+void DeliveryDelegateDummy::OnDeliverySuccess(DeliveryManager* delManager)
 {
-	//LOG("Packet succesfully delivered");
+	//Packet delivered
 }
 
-void DeliveryDelegateStandard::OnDeliveryFailure(DeliveryManager* delManager)
+void DeliveryDelegateDummy::OnDeliveryFailure(DeliveryManager* delManager)
 {
-	//ELOG("Packet lost");
+	//Packet dropped
 }

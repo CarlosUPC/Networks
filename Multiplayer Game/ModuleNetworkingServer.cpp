@@ -196,6 +196,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 			if (proxy != nullptr)
 			{
 				proxy->lastPacketReceivedTime = Time.time;
+				proxy->deliveryManager.processAckdSequenceNumbers(packet); //receive ack numbers from client
 			}
 
 		}
@@ -267,6 +268,7 @@ void ModuleNetworkingServer::onUpdate()
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
 					packet << ServerMessage::Replication;
+					clientProxy.deliveryManager.writeSequenceNumber(packet);
 
 					clientProxy.replicationManager.write(packet);
 
@@ -275,8 +277,8 @@ void ModuleNetworkingServer::onUpdate()
 					sendPacket(packet, clientProxy.address);
 					DLOG("Server send Replication packet");
 				}
-
 				// TODO(you): Reliability on top of UDP lab session
+				clientProxy.deliveryManager.processTimedOutPackets();
 			}
 		}
 	}

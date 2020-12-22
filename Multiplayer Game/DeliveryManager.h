@@ -12,7 +12,7 @@ public:
 	virtual void OnDeliveryFailure(DeliveryManager* delManager) = 0;
 };
 
-class DeliveryDelegateStandard : public DeliveryDelegate
+class DeliveryDelegateDummy : public DeliveryDelegate
 {
 public:
 	void OnDeliverySuccess(DeliveryManager* delManager);
