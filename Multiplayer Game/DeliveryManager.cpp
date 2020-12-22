@@ -13,6 +13,8 @@ Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet)
 	delivery->sequenceNumber = nextOutSeqNumber;
 	delivery->dispatchTime = Time.time;
 
+	delivery->delegate = new DeliveryDelegateStandard();
+
 	pendingDeliveries.push_back(delivery);
 
 	nextOutSeqNumber++;
@@ -32,7 +34,10 @@ bool DeliveryManager::processSequenceNumber(const InputMemoryStream& packet)
 		return true;
 	}
 	else
+	{
+		pendingAcks.push_back(seqNumber);
 		return false;
+	}
 }
 
 bool DeliveryManager::hasSequenceNumberPendingAck() const
@@ -42,7 +47,8 @@ bool DeliveryManager::hasSequenceNumberPendingAck() const
 
 void DeliveryManager::writeSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
-	packet << pendingAcks.size();
+	uint32 size = pendingAcks.size();
+	packet << size;
 
 	for (uint32 seqNumber : pendingAcks)
 		packet << seqNumber;
@@ -67,7 +73,8 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 			{
 				if (delivery->delegate)
 					delivery->delegate->OnDeliverySuccess(this);
-
+				
+				delete delivery->delegate;
 				delete delivery;
 				pendingDeliveries.erase(it);
 				break;
@@ -82,11 +89,17 @@ void DeliveryManager::processTimedOutPackets()
 	{
 		Delivery* delivery = *it;
 		if (Time.time - delivery->dispatchTime >= PACKET_DELIVERY_TIMEOUT_SECONDS)
+		{
 			if (delivery->delegate)
 				delivery->delegate->OnDeliveryFailure(this);
 
-		delete delivery;
-		it = pendingDeliveries.erase(it);
+			delete delivery->delegate;
+			delete delivery;
+			it = pendingDeliveries.erase(it);
+			
+			break;
+
+		}
 		it--;
 	}
 }
@@ -98,4 +111,14 @@ void DeliveryManager::clear()
 
 	pendingDeliveries.clear();
 	pendingAcks.clear();
+}
+
+void DeliveryDelegateStandard::OnDeliverySuccess(DeliveryManager* delManager)
+{
+	//LOG("Packet succesfully delivered");
+}
+
+void DeliveryDelegateStandard::OnDeliveryFailure(DeliveryManager* delManager)
+{
+	//ELOG("Packet lost");
 }
