@@ -62,6 +62,7 @@ private:
 	uint32 networkId = 0;
 
 	ReplicationManagerClient replicationManager;
+	DeliveryManager deliveryManager;
 	// Connecting stage
 
 	float secondsSinceLastHello = 0.0f;
