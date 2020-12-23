@@ -51,15 +51,33 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->sprite->texture = App->modResources->spacecraft3;
 					break;
 				}
+
+
+				if (spaceShipType == 0)//Laser
+				{
+					//Add Collider
+					gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
+					gameObject->collider->isTrigger = true;
+
+					//Add Behaviour
+					gameObject->behaviour = new Laser();
+					gameObject->behaviour->gameObject = gameObject;
+
+				}
+				else //Player
+				{
+					//Add Collider
+					gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
+					gameObject->collider->isTrigger = true;
+
+					//Add Behaviour
+					gameObject->behaviour = new Spaceship();
+					gameObject->behaviour->gameObject = gameObject;
+				}
+
+
 			}
 
-			//Add Collider
-			gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
-			gameObject->collider->isTrigger = true;
-
-			//Add Behaviour
-			gameObject->behaviour = new Spaceship();
-			gameObject->behaviour->gameObject = gameObject;
 
 		}
 		else if (action == ReplicationAction::Update)
@@ -67,9 +85,34 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (gameObject != nullptr)
 			{
-				packet >> gameObject->position.x;
-				packet >> gameObject->position.y;
-				packet >> gameObject->angle;
+				//packet >> gameObject->position.x;
+				//packet >> gameObject->position.y;
+				//packet >> gameObject->angle;
+
+				//vec2 _position;
+				//float _angle;
+
+				if (networkId == App->modNetClient->getPlayerNetworkID())
+				{
+					packet >> gameObject->position.x;
+					packet >> gameObject->position.y;
+					packet >> gameObject->angle;
+
+					continue;
+				}
+
+				packet >> gameObject->final_position.x;
+				packet >> gameObject->final_position.y;
+				packet >> gameObject->final_angle;
+
+				gameObject->initial_position = gameObject->position;
+				gameObject->initial_angle = gameObject->angle;
+
+
+				//gameObject->final_position = _position;
+				//gameObject->final_angle = _angle;
+
+				gameObject->secondsElapsed = .0f;
 			}
 
 		}
