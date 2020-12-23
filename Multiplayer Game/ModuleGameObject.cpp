@@ -1,5 +1,6 @@
 #include "Networks.h"
 
+
 bool ModuleGameObject::init()
 {
 	return true;
@@ -104,6 +105,24 @@ void ModuleGameObject::Destroy(GameObject * gameObject, float delaySeconds)
 			break;
 		}
 	}
+}
+
+vec2 ModuleGameObject::Interpolate(vec2& initial, vec2 & final, float timeElapsed)
+{
+	if (timeElapsed > 0.2f)
+		return final;
+
+	vec2 diff = final - initial;
+	return (diff * timeElapsed / 0.2f) + initial;
+}
+
+float ModuleGameObject::Interpolate(float initial, float final, float timeElapsed)
+{
+	if (timeElapsed > 0.2f)
+		return final;
+
+	float diff = final - initial;
+	return (diff * timeElapsed / 0.2f) + initial;
 }
 
 GameObject * Instantiate()

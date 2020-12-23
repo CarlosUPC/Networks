@@ -26,6 +26,16 @@ struct GameObject
 	uint32 networkId = 0;                    // NOTE(jesus): Only for network game objects
 	bool networkInterpolationEnabled = true; // NOTE(jesus): Only for network game objects
 
+	//Entity interpolation vars
+	vec2 initial_position = { .0f, .0f };
+	float initial_angle = .0f;
+
+	vec2 final_position = { .0f, .0f };
+	float final_angle = .0f;
+
+	float secondsElapsed = -1.0f;
+
+
 	// NOTE(jesus): Don't use in gameplay systems (use Instantiate, Destroy instead)
 	enum State {
 		NON_EXISTING,
@@ -66,7 +76,9 @@ public:
 
 	static void Destroy(GameObject * gameObject, float delaySeconds);
 
-
+	//Entity interpolation static funcs
+	static vec2 Interpolate(vec2& initial, vec2 & final, float timeElapsed);
+	static float Interpolate(float initial, float final, float timeElapsed);
 
 	GameObject gameObjects[MAX_GAME_OBJECTS] = {};
 
