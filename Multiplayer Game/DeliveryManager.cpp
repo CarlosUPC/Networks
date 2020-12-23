@@ -85,7 +85,7 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 
 void DeliveryManager::processTimedOutPackets()
 {
-	for (std::list<Delivery*>::iterator it = pendingDeliveries.begin(); it != pendingDeliveries.end(); ++it)
+	for (std::list<Delivery*>::iterator it = pendingDeliveries.begin(); it != pendingDeliveries.end();)
 	{
 		Delivery* delivery = *it;
 		if (Time.time - delivery->dispatchTime >= PACKET_DELIVERY_TIMEOUT_SECONDS)
@@ -99,6 +99,10 @@ void DeliveryManager::processTimedOutPackets()
 			
 			//break;
 
+		}
+		else
+		{
+			++it;
 		}
 		
 	}

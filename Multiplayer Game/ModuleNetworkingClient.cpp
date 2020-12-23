@@ -151,6 +151,19 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			}
 
 			packet >> inputDataFront;
+
+			//CLIENT SIDE PREDICTION ---- Reapply inputs not processed by the server
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (playerGameObject != nullptr)
+			{
+				for (int i = inputDataFront; i != inputDataBack; ++i)
+				{
+					InputPacketData inputPacketData = inputData[i];
+					InputController inputController = inputControllerFromInputPacketData(inputPacketData);
+
+					playerGameObject->behaviour->onInput(Input);
+				}
+			}
 		}
 		// TODO(you): Reliability on top of UDP lab session
 	}
@@ -223,8 +236,7 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
 		}
 
-
-
+		
 		// Input delivery interval timed out: create a new input packet
 		if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
 		{
@@ -259,6 +271,8 @@ void ModuleNetworkingClient::onUpdate()
 		if (playerGameObject != nullptr)
 		{
 			App->modRender->cameraPosition = playerGameObject->position;
+			//Process new input: Client Side
+			playerGameObject->behaviour->onInput(Input);
 		}
 		else
 		{
