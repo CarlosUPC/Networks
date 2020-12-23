@@ -60,8 +60,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					gameObject->collider->isTrigger = true;
 
 					//Add Behaviour
-					gameObject->behaviour = new Laser();
-					gameObject->behaviour->gameObject = gameObject;
+					//gameObject->behaviour = new Laser();
+					//gameObject->behaviour->gameObject = gameObject;
 
 				}
 				else //Player

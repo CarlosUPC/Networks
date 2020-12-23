@@ -105,7 +105,7 @@ void ModuleNetworkingClient::onGui()
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
 {
 	// TODO(you): UDP virtual connection lab session
-	
+	lastPacketReceivedTime = Time.time;
 	
 	uint32 protoId;
 	packet >> protoId;
@@ -134,7 +134,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	{
 		if (message == ServerMessage::Ping)
 		{
-			lastPacketReceivedTime = Time.time;
+			//lastPacketReceivedTime = Time.time;
 		}
 		
 		// TODO(you): World state replication lab session
@@ -153,6 +153,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			packet >> inputDataFront;
 
 			//CLIENT SIDE PREDICTION ---- Reapply inputs not processed by the server
+
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr)
 			{
@@ -200,6 +201,48 @@ void ModuleNetworkingClient::onUpdate()
 		// TODO(you): UDP virtual connection lab session
 
 		secondsSinceLastPing += Time.deltaTime;
+		secondsSinceLastInputDelivery += Time.deltaTime;
+
+		if (inputDataBack - inputDataFront < ArrayCount(inputData))
+		{
+			uint32 currentInputData = inputDataBack++;
+			InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
+			inputPacketData.sequenceNumber = currentInputData;
+			inputPacketData.horizontalAxis = Input.horizontalAxis;
+			inputPacketData.verticalAxis = Input.verticalAxis;
+			inputPacketData.buttonBits = packInputControllerButtons(Input);
+
+			//Process the new input: Client Side
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (playerGameObject != nullptr)
+			{
+				playerGameObject->behaviour->onInput(Input);
+			}
+
+			// Create packet (if there's input and the input delivery interval exceeded)
+			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
+			{
+				secondsSinceLastInputDelivery = 0.0f;
+
+				OutputMemoryStream packet;
+				packet << PROTOCOL_ID;
+				packet << ClientMessage::Input;
+
+				for (uint32 i = inputDataFront; i < inputDataBack; ++i)
+				{
+					InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
+					packet << inputPacketData.sequenceNumber;
+					packet << inputPacketData.horizontalAxis;
+					packet << inputPacketData.verticalAxis;
+					packet << inputPacketData.buttonBits;
+				}
+
+				// Clear the queue
+				//inputDataFront = inputDataBack;
+
+				sendPacket(packet, serverAddress);
+			}
+		}
 
 		if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
 		{
@@ -223,46 +266,6 @@ void ModuleNetworkingClient::onUpdate()
 
 		}
 
-
-		// Process more inputs if there's space
-		if (inputDataBack - inputDataFront < ArrayCount(inputData))
-		{
-			// Pack current input
-			uint32 currentInputData = inputDataBack++;
-			InputPacketData &inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
-			inputPacketData.sequenceNumber = currentInputData;
-			inputPacketData.horizontalAxis = Input.horizontalAxis;
-			inputPacketData.verticalAxis = Input.verticalAxis;
-			inputPacketData.buttonBits = packInputControllerButtons(Input);
-		}
-
-		
-		// Input delivery interval timed out: create a new input packet
-		if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
-		{
-			secondsSinceLastInputDelivery = 0.0f;
-
-			OutputMemoryStream packet;
-			packet << PROTOCOL_ID;
-			packet << ClientMessage::Input;
-
-			// TODO(you): Reliability on top of UDP lab session
-
-			for (uint32 i = inputDataFront; i < inputDataBack; ++i)
-			{
-				InputPacketData &inputPacketData = inputData[i % ArrayCount(inputData)];
-				packet << inputPacketData.sequenceNumber;
-				packet << inputPacketData.horizontalAxis;
-				packet << inputPacketData.verticalAxis;
-				packet << inputPacketData.buttonBits;
-			}
-
-			// Clear the queue
-			//inputDataFront = inputDataBack;
-
-			sendPacket(packet, serverAddress);
-		}
-
 		
 		// TODO(you): Latency management lab session
 
@@ -272,7 +275,7 @@ void ModuleNetworkingClient::onUpdate()
 		{
 			App->modRender->cameraPosition = playerGameObject->position;
 			//Process new input: Client Side
-			playerGameObject->behaviour->onInput(Input);
+			//playerGameObject->behaviour->onInput(Input);
 		}
 		else
 		{

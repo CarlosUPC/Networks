@@ -73,7 +73,7 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 			{
 				if (delivery->delegate)
 					delivery->delegate->OnDeliverySuccess(this);
-				
+
 				delete delivery->delegate;
 				delete delivery;
 				pendingDeliveries.erase(it);
@@ -102,7 +102,7 @@ void DeliveryManager::processTimedOutPackets()
 		}
 		else
 		{
-			++it;
+			it++;
 		}
 		
 	}

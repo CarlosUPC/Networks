@@ -22,6 +22,30 @@ bool ModuleGameObject::preUpdate()
 	for (GameObject &gameObject : gameObjects)
 	{
 		gameObject.state = gNextState[gameObject.state];
+
+		if (App->modNetClient->isConnected())
+		{
+
+
+			//Entity interpolation
+			if (gameObject.networkId != 0 && gameObject.networkId != App->modNetClient->getPlayerNetworkID())
+			{
+
+				if (gameObject.secondsElapsed != -1.0f)
+				{
+					if (gameObject.secondsElapsed > 0.2f)
+					{
+						gameObject.secondsElapsed = -1.0f;
+						continue;
+					}
+
+					gameObject.position = Interpolate(gameObject.initial_position, gameObject.final_position, gameObject.secondsElapsed);
+					gameObject.angle = Interpolate(gameObject.initial_angle, gameObject.final_angle, gameObject.secondsElapsed);
+
+					gameObject.secondsElapsed += Time.deltaTime;
+				}
+			}
+		}
 	}
 
 	END_TIMED_BLOCK(GOPreUpdate);

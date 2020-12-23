@@ -191,14 +191,13 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 			}
 		}
 		// TODO(you): UDP virtual connection lab session
-		else if (message == ClientMessage::Ping)
+		else if (message == ClientMessage::Ping && proxy)
 		{
-			if (proxy != nullptr)
-			{
-				proxy->lastPacketReceivedTime = Time.time;
-				proxy->deliveryManager.processAckdSequenceNumbers(packet); //receive ack numbers from client
-			}
-
+			proxy->deliveryManager.processAckdSequenceNumbers(packet);
+		}
+		if (proxy != nullptr)
+		{
+			proxy->lastPacketReceivedTime = Time.time;
 		}
 
 	}
@@ -211,8 +210,8 @@ void ModuleNetworkingServer::onUpdate()
 	if (state == ServerState::Listening)
 	{
 
-		secondsSinceLastPing += Time.deltaTime;
-		secondsSinceLastReplication += Time.deltaTime;
+		//secondsSinceLastPing += Time.deltaTime;
+		//secondsSinceLastReplication += Time.deltaTime;
 
 
 		// Handle networked game object destructions
@@ -242,7 +241,7 @@ void ModuleNetworkingServer::onUpdate()
 
 				if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
 				{
-					secondsSinceLastPing = 0.0f;
+					//secondsSinceLastPing = 0.0f;
 
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
@@ -261,9 +260,9 @@ void ModuleNetworkingServer::onUpdate()
 
 				// TODO(you): World state replication lab session
 
-				if (secondsSinceLastReplication >= REPLICATION_INTERVAL_SECONDS && !clientProxy.replicationManager.isEmpty())
+				if (secondsSinceLastReplication >= REPLICATION_INTERVAL_SECONDS /*&& !clientProxy.replicationManager.isEmpty()*/)
 				{
-					secondsSinceLastReplication = 0.0f;
+					//secondsSinceLastReplication = 0.0f;
 
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
@@ -281,6 +280,18 @@ void ModuleNetworkingServer::onUpdate()
 				clientProxy.deliveryManager.processTimedOutPackets();
 			}
 		}
+
+		//Ping timers
+		if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
+			secondsSinceLastPing = 0.0f;
+
+		secondsSinceLastPing += Time.deltaTime;
+
+		//Replication timers
+		if (secondsSinceLastReplication >= REPLICATION_INTERVAL_SECONDS)
+			secondsSinceLastReplication = 0.0f;
+
+		secondsSinceLastReplication += Time.deltaTime;
 	}
 }
 
