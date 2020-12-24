@@ -44,15 +44,20 @@ void ModuleNetworkingClient::onStart()
 		return;
 	}
 
+	//SETTING STUFF FOR RECONNECTION 
 	state = ClientState::Connecting;
 
 	inputDataFront = 0;
 	inputDataBack = 0;
 
 	secondsSinceLastHello = 9999.0f;
+	secondsSinceLastPing = 0.0f;
 	secondsSinceLastInputDelivery = 0.0f;
 
 	lastPacketReceivedTime = Time.time;
+
+	replicationManager = {};
+	deliveryManager = {};
 }
 
 void ModuleNetworkingClient::onGui()

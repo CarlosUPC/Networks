@@ -267,11 +267,11 @@ void ModuleNetworkingServer::onUpdate()
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
 					packet << ServerMessage::Replication;
-					clientProxy.deliveryManager.writeSequenceNumber(packet);
+					clientProxy.deliveryManager.writeSequenceNumber(packet); // Delivery notification
 
-					clientProxy.replicationManager.write(packet);
+					clientProxy.replicationManager.write(packet); // Replication update
 
-					packet << clientProxy.nextExpectedInputSequenceNumber;
+					packet << clientProxy.nextExpectedInputSequenceNumber; // Redudancy notification
 
 					sendPacket(packet, clientProxy.address);
 					DLOG("Server send Replication packet");
