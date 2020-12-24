@@ -44,7 +44,7 @@ void ModuleNetworkingClient::onStart()
 		return;
 	}
 
-	//SETTING STUFF FOR RECONNECTION 
+	//RESET STUFF FOR RECONNECTION 
 	state = ClientState::Connecting;
 
 	inputDataFront = 0;

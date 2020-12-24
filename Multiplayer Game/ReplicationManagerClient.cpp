@@ -52,13 +52,12 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					break;
 				}
 
-
 				if (spaceShipType == 0)//Laser
 				{
 					//Add Collider
 					gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
 					gameObject->collider->isTrigger = true;
-
+					gameObject->sprite->order = 1;
 					//Add Behaviour
 					//gameObject->behaviour = new Laser();
 					//gameObject->behaviour->gameObject = gameObject;
@@ -73,6 +72,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					//Add Behaviour
 					gameObject->behaviour = new Spaceship();
 					gameObject->behaviour->gameObject = gameObject;
+					gameObject->sprite->order = 2;
 				}
 
 

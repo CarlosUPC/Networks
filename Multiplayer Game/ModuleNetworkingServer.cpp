@@ -388,7 +388,7 @@ GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initi
 
 	// Create sprite
 	gameObject->sprite = App->modRender->addSprite(gameObject);
-	gameObject->sprite->order = 5;
+	gameObject->sprite->order = 2;
 	if (spaceshipType == 0) {
 		gameObject->sprite->texture = App->modResources->spacecraft1;
 	}
@@ -407,6 +407,8 @@ GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initi
 	Spaceship * spaceshipBehaviour = App->modBehaviour->addSpaceship(gameObject);
 	gameObject->behaviour = spaceshipBehaviour;
 	gameObject->behaviour->isServer = true;
+
+	
 
 	return gameObject;
 }

@@ -44,7 +44,7 @@ void Spaceship::start()
 	lifebar = Instantiate();
 	lifebar->sprite = App->modRender->addSprite(lifebar);
 	lifebar->sprite->pivot = vec2{ 0.0f, 0.5f };
-	lifebar->sprite->order = 5;
+	lifebar->sprite->order = 1;
 }
 
 void Spaceship::onInput(const InputController &input)
@@ -82,7 +82,7 @@ void Spaceship::onInput(const InputController &input)
 			laser->size = { 20, 60 };
 
 			laser->sprite = App->modRender->addSprite(laser);
-			laser->sprite->order = 3;
+			laser->sprite->order = 1;
 			laser->sprite->texture = App->modResources->laser;
 
 			Laser *laserBehaviour = App->modBehaviour->addLaser(laser);
