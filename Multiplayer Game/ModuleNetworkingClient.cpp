@@ -205,6 +205,7 @@ void ModuleNetworkingClient::onUpdate()
 
 		if (inputDataBack - inputDataFront < ArrayCount(inputData))
 		{
+			//Create new input packet
 			uint32 currentInputData = inputDataBack++;
 			InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
 			inputPacketData.sequenceNumber = currentInputData;

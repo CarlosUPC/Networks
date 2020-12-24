@@ -526,5 +526,5 @@ void NetworkDestroy(GameObject * gameObject, float delaySeconds)
 	ASSERT(App->modNetServer->isConnected());
 	ASSERT(gameObject->networkId != 0);
 
-	App->modNetServer->destroyNetworkObject(gameObject, delaySeconds);
+	App->modNetServer->destroyNetworkObject(gameObject); // remove delay parameter until i understand how delay function works
 }

@@ -35,8 +35,8 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 
 	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
 
-	if (map.find(networkId) == map.end())
-		map[networkId] = command;
+	//if (map.find(networkId) == map.end())
+	map[networkId] = command;
 }
 
 

@@ -19,6 +19,8 @@ void Laser::update()
 
 	if (isServer)
 	{
+		NetworkUpdate(gameObject);
+
 		const float neutralTimeSeconds = 0.1f;
 		if (secondsSinceCreation > neutralTimeSeconds && gameObject->collider == nullptr) {
 			gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
