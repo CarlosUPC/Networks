@@ -53,6 +53,7 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastHello = 9999.0f;
 	secondsSinceLastPing = 0.0f;
 	secondsSinceLastInputDelivery = 0.0f;
+	secondsDeathTimer = 0.0f;
 
 	lastPacketReceivedTime = Time.time;
 
@@ -144,19 +145,38 @@ void ModuleNetworkingClient::onGui()
 		{
 			if (player->die)
 			{
-				if (ImGui::Begin("Death", &player->die, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+				ImGui::OpenPopup("GAME OVER");
+
+				if (ImGui::BeginPopupModal("GAME OVER", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
 				{
+					
+
 					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
+					ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+					ImGui::SetCursorPosX( 180 / 2 - ImGui::CalcTextSize("GAME OVER").x / 2);
 					ImGui::Text("GAME OVER");
 					ImGui::Separator();
 					ImGui::PopStyleColor();
 
+					ImGui::NewLine();
 
-					disconnect();
-					player->die = false;
+					if (ImGui::Button("Return to lobby", { 170, 35 }))
+					{
+						secondsDeathTimer = 0.0f;
+						disconnect();
+					}
 
-					ImGui::End();
-				}
+					const float death_time = 5.0f;
+					if (secondsDeathTimer >= death_time)
+					{
+						secondsDeathTimer = 0.0f;
+						disconnect();
+					}
+					secondsDeathTimer += Time.deltaTime;
+
+
+					ImGui::EndPopup();
+				}				
 			}
 
 		}

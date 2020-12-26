@@ -89,7 +89,7 @@ private:
 
 	double lastPacketReceivedTime = 0.0;
 	float secondsSinceLastPing = 0.0f;
-
+	float secondsDeathTimer = 0.0f;
 
 	//////////////////////////////////////////////////////////////////////
 	// Replication
