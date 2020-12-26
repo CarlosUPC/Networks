@@ -144,9 +144,17 @@ void ModuleNetworkingClient::onGui()
 		ImGui::SetNextWindowSize(ImVec2(150.0f, 115.0f));
 		if (ImGui::Begin("Ranking"))
 		{
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
-			ImGui::Text("You: %s Points: ", playerName.c_str());
-			ImGui::PopStyleColor();
+			int i = 1;
+			for (std::pair<std::string, uint32> player : rank_list)
+			{
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 0.0f, 1.0f));
+				ImGui::Text("[%u] - %s ", i, player.first.c_str());
+				ImGui::PopStyleColor();
+				ImGui::Text(" - Kills: %u ", player.second);
+				
+				++i;
+			}
+			
 		}
 		ImGui::End();
 
@@ -254,6 +262,23 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 
 					playerGameObject->behaviour->onInput(Input);
 				}
+			}
+		}
+
+		if (message == ServerMessage::Ranking)
+		{
+			rank_list.clear();
+
+			while (packet.RemainingByteCount() > 0)
+			{
+				std::string name;
+				uint32 kills;
+
+				packet >> name;
+				packet >> kills;
+
+				if (rank_list.find(name) == rank_list.end())
+					rank_list[name] = kills;
 			}
 		}
 		// TODO(you): Reliability on top of UDP lab session

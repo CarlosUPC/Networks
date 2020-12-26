@@ -34,7 +34,7 @@ private:
 
 	void onDisconnect() override;
 
-
+	
 
 	//////////////////////////////////////////////////////////////////////
 	// Client proxies
@@ -69,6 +69,7 @@ private:
 
     void destroyClientProxy(ClientProxy *clientProxy);
 
+	void sortClientProxies();
 
 
 public:
@@ -127,6 +128,7 @@ private:
 	// TODO(you): UDP virtual connection lab session
 	float secondsSinceLastPing = 0.0f;
 	float secondsSinceLastReplication = 0.0f;
+	float secondsSinceLastRank = 0.0f;
 };
 
 

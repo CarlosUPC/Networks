@@ -278,6 +278,11 @@ void ModuleNetworkingServer::onUpdate()
 				}
 				// TODO(you): Reliability on top of UDP lab session
 				clientProxy.deliveryManager.processTimedOutPackets();
+
+				if (secondsSinceLastRank >= RANKING_INTERVAL_SECONDS)
+				{
+					sortClientProxies();
+				}
 			}
 		}
 
@@ -292,6 +297,12 @@ void ModuleNetworkingServer::onUpdate()
 			secondsSinceLastReplication = 0.0f;
 
 		secondsSinceLastReplication += Time.deltaTime;
+
+		//Ranking timers
+		if (secondsSinceLastRank >= RANKING_INTERVAL_SECONDS)
+			secondsSinceLastRank = 0.0f;
+
+		secondsSinceLastRank += Time.deltaTime;
 	}
 }
 
@@ -371,6 +382,61 @@ void ModuleNetworkingServer::destroyClientProxy(ClientProxy *clientProxy)
 	}
 
     *clientProxy = {};
+}
+
+void ModuleNetworkingServer::sortClientProxies()
+{
+	bool ordered = true;
+	
+	while (ordered)
+	{
+		ordered = false;
+
+		for (int i = 0; i < MAX_CLIENTS - 1; ++i)
+		{
+			
+			if (clientProxies[i + 1].connected)
+			{
+				if ((!clientProxies[i].connected && clientProxies[i + 1].connected) ||
+					(clientProxies[i].gameObject && clientProxies[i].gameObject->die && clientProxies[i + 1].gameObject && !clientProxies[i + 1].gameObject->die) ||
+					(clientProxies[i].gameObject->kills < clientProxies[i + 1].gameObject->kills))
+				{
+					ClientProxy a = clientProxies[i];
+					clientProxies[i] = clientProxies[i + 1];
+					clientProxies[i + 1] = a;
+
+					ordered = true;
+				
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		ClientProxy& client = clientProxies[i];
+
+		if (!client.connected)
+			return; 
+
+		OutputMemoryStream packet;
+		packet << PROTOCOL_ID;
+		packet << ServerMessage::Ranking;
+
+		for (int i = 0; i < MAX_CLIENTS; ++i)
+		{
+			ClientProxy* nextClient = nullptr;
+			nextClient = &clientProxies[i];
+
+			if (nextClient->connected)
+			{
+				packet << nextClient->name;
+				packet << nextClient->gameObject->kills;
+			}
+		}
+
+		sendPacket(packet, client.address);
+	}
 }
 
 
