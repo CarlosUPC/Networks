@@ -99,6 +99,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					packet >> gameObject->angle;
 					packet >> gameObject->kills;
 					packet >> gameObject->die;
+					packet >> gameObject->ultimate;
 
 					continue;
 				}
@@ -108,6 +109,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				packet >> gameObject->final_angle;
 				packet >> gameObject->kills;
 				packet >> gameObject->die;
+				packet >> gameObject->ultimate;
 
 				gameObject->initial_position = gameObject->position;
 				gameObject->initial_angle = gameObject->angle;

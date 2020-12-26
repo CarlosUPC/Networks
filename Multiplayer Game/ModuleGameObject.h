@@ -38,8 +38,8 @@ struct GameObject
 	//Gameplay
 	uint32 kills = 0;
 	bool die = false;
-
-
+	//float ultimateTimer = 0.0f;
+	bool ultimate = false;
 	// NOTE(jesus): Don't use in gameplay systems (use Instantiate, Destroy instead)
 	enum State {
 		NON_EXISTING,

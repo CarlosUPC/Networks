@@ -125,8 +125,17 @@ void ModuleNetworkingClient::onGui()
 			{
 				//GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
 				if (player != nullptr) {
-					ImGui::Text("ULTIMATE: 0");
+					if(!player->ultimate)
+						ImGui::Text(" - Ultimate in cooldown");
+					else
+					{
+						ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 1.0f, 0.0f, 1.0f));
+						ImGui::Text(" - ULTIMATE READY");
+						ImGui::PopStyleColor();
+					}
+					
 				}
+
 			}
 		}
 		ImGui::End();
@@ -135,9 +144,9 @@ void ModuleNetworkingClient::onGui()
 		ImGui::SetNextWindowSize(ImVec2(150.0f, 115.0f));
 		if (ImGui::Begin("Ranking"))
 		{
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
 			ImGui::Text("You: %s Points: ", playerName.c_str());
-			
-			
+			ImGui::PopStyleColor();
 		}
 		ImGui::End();
 

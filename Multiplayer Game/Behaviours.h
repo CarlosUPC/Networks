@@ -51,8 +51,9 @@ struct Spaceship : public Behaviour
 {
 	static const uint8 MAX_HIT_POINTS = 5;
 	uint8 hitPoints = MAX_HIT_POINTS;
-
 	GameObject *lifebar = nullptr;
+	float secondsSinceLastUltimate = 0.0f;
+	bool enable_ultimate = false;
 
 	BehaviourType type() const override { return BehaviourType::Spaceship; }
 
@@ -69,4 +70,6 @@ struct Spaceship : public Behaviour
 	void write(OutputMemoryStream &packet) override;
 
 	void read(const InputMemoryStream &packet) override;
+
+	void spawnLaser(GameObject* object, float angle);
 };

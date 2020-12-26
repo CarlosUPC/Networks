@@ -49,6 +49,7 @@ void Spaceship::start()
 
 void Spaceship::onInput(const InputController &input)
 {
+	//ROTATE
 	if (input.horizontalAxis != 0.0f)
 	{
 		const float rotateSpeed = 180.0f;
@@ -59,7 +60,7 @@ void Spaceship::onInput(const InputController &input)
 			NetworkUpdate(gameObject);
 		}
 	}
-
+	//MOVEMENT
 	if (input.actionDown == ButtonState::Pressed)
 	{
 		const float advanceSpeed = 200.0f;
@@ -70,12 +71,12 @@ void Spaceship::onInput(const InputController &input)
 			NetworkUpdate(gameObject);
 		}
 	}
-
+	//BASIC ATTACK
 	if (input.actionLeft == ButtonState::Press)
 	{
 		if (isServer)
 		{
-			GameObject *laser = NetworkInstantiate();
+			GameObject* laser = NetworkInstantiate();
 
 			laser->position = gameObject->position;
 			laser->angle = gameObject->angle;
@@ -85,12 +86,51 @@ void Spaceship::onInput(const InputController &input)
 			laser->sprite->order = 1;
 			laser->sprite->texture = App->modResources->laser;
 
-			Laser *laserBehaviour = App->modBehaviour->addLaser(laser);
+			Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
 			laserBehaviour->isServer = isServer;
 
 			laser->tag = gameObject->tag;
 		}
 	}
+
+	//ULTIMATE
+	const float cooldown = 5.0f;
+	if (input.actionRight == ButtonState::Press && secondsSinceLastUltimate >= cooldown)
+	{
+		if (isServer)
+		{
+			spawnLaser(gameObject, gameObject->angle);
+			spawnLaser(gameObject, gameObject->angle + 45.0f);
+			spawnLaser(gameObject, gameObject->angle + 90.0f);
+			spawnLaser(gameObject, gameObject->angle + 135.0f);
+			spawnLaser(gameObject, gameObject->angle + 180.0f);
+			spawnLaser(gameObject, gameObject->angle + 225.0f);
+			spawnLaser(gameObject, gameObject->angle + 270.0f);
+			spawnLaser(gameObject, gameObject->angle + 315.0f);
+			spawnLaser(gameObject, gameObject->angle + 360.0f);
+
+			
+
+			secondsSinceLastUltimate = 0.0f;
+
+			enable_ultimate = false;
+			gameObject->ultimate = false;
+			NetworkUpdate(gameObject);
+		}
+		
+	}
+
+	//Notify Client that has ultimate ready to use
+	if (isServer)
+	{
+		if (secondsSinceLastUltimate >= cooldown && !enable_ultimate)
+		{
+			gameObject->ultimate = true;
+			NetworkUpdate(gameObject);
+			enable_ultimate = true;
+		}
+	}
+
 }
 
 void Spaceship::update()
@@ -101,6 +141,8 @@ void Spaceship::update()
 	lifebar->position = gameObject->position + vec2{ -50.0f, -50.0f };
 	lifebar->size = vec2{ lifeRatio * 80.0f, 5.0f };
 	lifebar->sprite->color = lerp(colorDead, colorAlive, lifeRatio);
+
+	secondsSinceLastUltimate += Time.deltaTime;
 }
 
 void Spaceship::destroy()
@@ -174,4 +216,22 @@ void Spaceship::write(OutputMemoryStream & packet)
 void Spaceship::read(const InputMemoryStream & packet)
 {
 	packet >> hitPoints;
+}
+
+void Spaceship::spawnLaser(GameObject* object, float angle)
+{
+	GameObject* laser = NetworkInstantiate();
+
+	laser->position = gameObject->position;
+	laser->angle = angle;
+	laser->size = { 20, 60 };
+
+	laser->sprite = App->modRender->addSprite(laser);
+	laser->sprite->order = 1;
+	laser->sprite->texture = App->modResources->laser;
+
+	Laser* laserBehaviour = App->modBehaviour->addLaser(laser);
+	laserBehaviour->isServer = isServer;
+
+	laser->tag = gameObject->tag;
 }
