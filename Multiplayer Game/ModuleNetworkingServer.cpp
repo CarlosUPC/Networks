@@ -413,6 +413,20 @@ GameObject * ModuleNetworkingServer::spawnPlayer(uint8 spaceshipType, vec2 initi
 	return gameObject;
 }
 
+GameObject* ModuleNetworkingServer::getNetworkObjectByTag(uint32 tag)
+{
+	for (const auto& clientProxy : clientProxies)
+	{
+		GameObject* gameObject = clientProxy.gameObject;
+		if (gameObject != nullptr && gameObject->tag == tag)
+		{
+			return gameObject;
+		}
+	}
+
+	return nullptr;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Update / destruction

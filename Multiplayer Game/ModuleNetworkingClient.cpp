@@ -105,6 +105,62 @@ void ModuleNetworkingClient::onGui()
 			ImGui::InputFloat("Delivery interval (s)", &inputDeliveryIntervalSeconds, 0.01f, 0.1f, 4);
 		}
 	}
+
+	if (state == ClientState::Connected) {
+		ImGui::SetNextWindowPos(ImVec2(320.0f, 15.0f));
+		ImGui::SetNextWindowSize(ImVec2(200.0f, 115.0f));
+
+		GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
+		if (ImGui::Begin("Player"))
+		{
+
+			if (ImGui::CollapsingHeader("Score", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				if (player != nullptr) {
+					ImGui::Text(" - Kills: %u", player->kills);
+				}
+			}
+			if (ImGui::CollapsingHeader("PowerUp", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				//GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
+				if (player != nullptr) {
+					ImGui::Text("ULTIMATE: 0");
+				}
+			}
+		}
+		ImGui::End();
+
+		ImGui::SetNextWindowPos(ImVec2(820.0f, 15.0f));
+		ImGui::SetNextWindowSize(ImVec2(150.0f, 115.0f));
+		if (ImGui::Begin("Ranking"))
+		{
+			ImGui::Text("You: %s Points: ", playerName.c_str());
+			
+			
+		}
+		ImGui::End();
+
+		if (player != nullptr)
+		{
+			if (player->die)
+			{
+				if (ImGui::Begin("Death", &player->die, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+				{
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
+					ImGui::Text("GAME OVER");
+					ImGui::Separator();
+					ImGui::PopStyleColor();
+
+
+					disconnect();
+					player->die = false;
+
+					ImGui::End();
+				}
+			}
+
+		}
+	}
 }
 
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)

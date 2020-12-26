@@ -131,7 +131,18 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 				size = 250.0f + 100.0f * Random.next();
 				position = gameObject->position;
 
-				NetworkDestroy(gameObject);
+				// Get kill point
+				GameObject* killer = App->modNetServer->getNetworkObjectByTag(c2.gameObject->tag);
+				if (killer != nullptr)
+				{
+					++killer->kills;
+					NetworkUpdate(killer);
+				}
+
+
+				// Victim died
+				gameObject->die = true;
+				//NetworkDestroy(gameObject); //Commented for disconnect client (maybe is not good idea)
 			}
 
 			GameObject *explosion = NetworkInstantiate();

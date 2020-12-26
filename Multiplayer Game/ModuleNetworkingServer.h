@@ -79,7 +79,7 @@ public:
 
 	GameObject * spawnPlayer(uint8 spaceshipType, vec2 initialPosition, float initialAngle);
 
-
+	GameObject* getNetworkObjectByTag(uint32 tag);
 
 private:
 

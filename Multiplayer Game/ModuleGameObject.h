@@ -35,6 +35,10 @@ struct GameObject
 
 	float secondsElapsed = -1.0f;
 
+	//Gameplay
+	uint32 kills = 0;
+	bool die = false;
+
 
 	// NOTE(jesus): Don't use in gameplay systems (use Instantiate, Destroy instead)
 	enum State {
