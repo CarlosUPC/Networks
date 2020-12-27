@@ -184,6 +184,7 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 
 				// Victim died
 				gameObject->die = true;
+				//NetworkUpdate(gameObject);
 				//NetworkDestroy(gameObject); //Commented for disconnect client (maybe is not good idea)
 			}
 

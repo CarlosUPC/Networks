@@ -101,6 +101,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					packet >> gameObject->die;
 					packet >> gameObject->ultimate;
 
+					
+					
+
 					continue;
 				}
 
@@ -110,6 +113,13 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				packet >> gameObject->kills;
 				packet >> gameObject->die;
 				packet >> gameObject->ultimate;
+
+				if(gameObject->die) //Destroy gameObject from other clients
+				{
+					App->modLinkingContext->unregisterNetworkGameObject(gameObject);
+					Destroy(gameObject);
+				}
+				
 
 				gameObject->initial_position = gameObject->position;
 				gameObject->initial_angle = gameObject->angle;

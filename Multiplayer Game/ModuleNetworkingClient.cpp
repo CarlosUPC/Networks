@@ -54,6 +54,7 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastPing = 0.0f;
 	secondsSinceLastInputDelivery = 0.0f;
 	secondsDeathTimer = 0.0f;
+	
 
 	lastPacketReceivedTime = Time.time;
 
@@ -162,6 +163,7 @@ void ModuleNetworkingClient::onGui()
 		{
 			if (player->die)
 			{
+				
 				ImGui::OpenPopup("GAME OVER");
 
 				if (ImGui::BeginPopupModal("GAME OVER", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
