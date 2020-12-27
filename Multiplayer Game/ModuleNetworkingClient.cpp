@@ -159,7 +159,42 @@ void ModuleNetworkingClient::onGui()
 		}
 		ImGui::End();
 
-		if (player != nullptr)
+		if (died)
+		{
+			ImGui::OpenPopup("GAME OVER");
+
+			if (ImGui::BeginPopupModal("GAME OVER", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
+			{
+
+
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
+				ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+				ImGui::SetCursorPosX(180 / 2 - ImGui::CalcTextSize("GAME OVER").x / 2);
+				ImGui::Text("GAME OVER");
+				ImGui::Separator();
+				ImGui::PopStyleColor();
+
+				ImGui::NewLine();
+
+				if (ImGui::Button("Return to lobby", { 170, 35 }))
+				{
+					secondsDeathTimer = 0.0f;
+					disconnect();
+				}
+
+				const float death_time = 5.0f;
+				if (secondsDeathTimer >= death_time)
+				{
+					secondsDeathTimer = 0.0f;
+					disconnect();
+				}
+				secondsDeathTimer += Time.deltaTime;
+
+
+				ImGui::EndPopup();
+			}
+		}
+		/*if (player != nullptr)
 		{
 			if (player->die)
 			{
@@ -198,7 +233,7 @@ void ModuleNetworkingClient::onGui()
 				}				
 			}
 
-		}
+		}*/
 	}
 }
 
@@ -283,6 +318,11 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 					rank_list[name] = kills;
 			}
 		}
+
+		if (message == ServerMessage::Death)
+		{
+			died = true;
+		}
 		// TODO(you): Reliability on top of UDP lab session
 	}
 }
@@ -331,11 +371,11 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
 
 			//Process the new input: Client Side
-			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			/*GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr)
 			{
 				playerGameObject->behaviour->onInput(Input);
-			}
+			}*/
 
 			// Create packet (if there's input and the input delivery interval exceeded)
 			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
@@ -361,6 +401,7 @@ void ModuleNetworkingClient::onUpdate()
 				sendPacket(packet, serverAddress);
 			}
 		}
+		else inputDataFront = inputDataBack;
 
 		if (Time.time - lastPacketReceivedTime >= DISCONNECT_TIMEOUT_SECONDS)
 		{

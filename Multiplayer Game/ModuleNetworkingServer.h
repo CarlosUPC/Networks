@@ -72,6 +72,8 @@ private:
 	void sortClientProxies();
 
 
+	ClientProxy* GetClientProxyByGameObject(GameObject* object);
+
 public:
 
 	//////////////////////////////////////////////////////////////////////
@@ -82,6 +84,7 @@ public:
 
 	GameObject* getNetworkObjectByTag(uint32 tag);
 
+	void disconnectClientProxyByGameObject(GameObject* object);
 private:
 
 	//////////////////////////////////////////////////////////////////////

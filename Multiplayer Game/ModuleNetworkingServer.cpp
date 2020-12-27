@@ -439,6 +439,35 @@ void ModuleNetworkingServer::sortClientProxies()
 	}
 }
 
+void ModuleNetworkingServer::disconnectClientProxyByGameObject(GameObject* object)
+{
+	
+
+	ModuleNetworkingServer::ClientProxy* proxy = GetClientProxyByGameObject(object);
+
+	if (proxy)
+	{
+		OutputMemoryStream packet;
+		packet << PROTOCOL_ID;
+		packet << ServerMessage::Death;
+		
+
+		sendPacket(packet, proxy->address);
+
+		onConnectionReset(proxy->address);
+	}
+}
+
+ModuleNetworkingServer::ClientProxy* ModuleNetworkingServer::GetClientProxyByGameObject(GameObject* object)
+{
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if (clientProxies[i].gameObject == object)
+			return &clientProxies[i];
+	}
+	return nullptr;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Spawning
