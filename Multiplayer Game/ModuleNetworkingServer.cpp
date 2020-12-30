@@ -270,7 +270,10 @@ void ModuleNetworkingServer::onUpdate()
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
 					packet << ServerMessage::Replication;
-					clientProxy.deliveryManager.writeSequenceNumber(packet); // Delivery notification
+
+					Delivery* delivery = clientProxy.deliveryManager.writeSequenceNumber(packet); // Delivery notification
+					if (delivery != nullptr)
+						delivery->delegate = new DeliveryDelegateServer(&clientProxy.replicationManager);
 
 					clientProxy.replicationManager.write(packet); // Replication update
 

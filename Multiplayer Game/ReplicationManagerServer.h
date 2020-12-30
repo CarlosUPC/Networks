@@ -1,7 +1,7 @@
 #pragma once
 
 // TODO(you): World state replication lab session
-
+#include "DeliveryManager.h"
 enum class ReplicationAction
 {
 	None, Create, Update, Input, Destroy
@@ -26,9 +26,12 @@ public:
 	void write(OutputMemoryStream& packet);
 
 	bool isEmpty() const; 
+	std::unordered_map<uint32, ReplicationCommand> GetReplicationData() const { return map; }
 
 private:
 	std::unordered_map<uint32, ReplicationCommand> map;
 
 	//More members...
 };
+
+

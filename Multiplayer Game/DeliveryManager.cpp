@@ -1,9 +1,19 @@
 #include "Networks.h"
+#include "DeliveryManager.h"
 
 // TODO(you): Reliability on top of UDP lab session
 
 //#include "DeliveryManager.h"
 
+
+DeliveryManager::DeliveryManager()
+{
+}
+
+DeliveryManager::~DeliveryManager()
+{
+	clear();
+}
 
 Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet)
 {
@@ -13,7 +23,7 @@ Delivery* DeliveryManager::writeSequenceNumber(OutputMemoryStream& packet)
 	delivery->sequenceNumber = nextOutSeqNumber;
 	delivery->dispatchTime = Time.time;
 
-	delivery->delegate = new DeliveryDelegateDummy();
+	//delivery->delegate = new DeliveryDelegateServer();
 
 	pendingDeliveries.push_back(delivery);
 
@@ -77,7 +87,7 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 				pendingDeliveries.remove(delivery);
 				delete delivery->delegate;
 				delete delivery;
-				//pendingDeliveries.erase(it);
+				
 				break;
 			}
 		}
@@ -113,14 +123,72 @@ void DeliveryManager::clear()
 
 	pendingDeliveries.clear();
 	pendingAcks.clear();
+
+	nextInSeqNumber = 0;
+	nextOutSeqNumber = 0;
 }
 
-void DeliveryDelegateDummy::OnDeliverySuccess(DeliveryManager* delManager)
+
+DeliveryDelegateServer::DeliveryDelegateServer(ReplicationManagerServer* replicationServer) 
+	: server(replicationServer), map(replicationServer->GetReplicationData())
+{
+	
+	for (std::unordered_map<uint32, ReplicationCommand>::iterator it = map.begin(); it != map.end(); ++it)
+	{
+		commands.push_back(it->second);
+	}
+}
+
+void DeliveryDelegateServer::OnDeliverySuccess(DeliveryManager* delManager)
 {
 	//Packet delivered
+	for (std::vector<ReplicationCommand>::iterator it = commands.begin(); it != commands.end(); ++it)
+	{
+		switch ((*it).action)
+		{
+		case ReplicationAction::Create:
+			
+			break;
+		case ReplicationAction::Update:
+			
+			break;
+		case ReplicationAction::Input:
+			
+			break;
+		case ReplicationAction::Destroy:
+			
+			break;
+		default:
+			break;
+		}
+	}
 }
 
-void DeliveryDelegateDummy::OnDeliveryFailure(DeliveryManager* delManager)
+void DeliveryDelegateServer::OnDeliveryFailure(DeliveryManager* delManager)
 {
-	//Packet dropped
+	//Packet previously dropped. Re-update client state
+	for (std::vector<ReplicationCommand>::iterator it = commands.begin(); it != commands.end(); ++it)
+	{
+		switch ((*it).action)
+		{
+		case ReplicationAction::Create:
+			if(App->modLinkingContext->getNetworkGameObject((*it).networkId) != nullptr)
+				server->create((*it).networkId);
+			break;
+		case ReplicationAction::Update:
+			if (App->modLinkingContext->getNetworkGameObject((*it).networkId) != nullptr)
+				server->update((*it).networkId);
+			break;
+		case ReplicationAction::Input:
+			if (App->modLinkingContext->getNetworkGameObject((*it).networkId) != nullptr)
+				server->input((*it).networkId, (*it).inputFrontData);
+			break;
+		case ReplicationAction::Destroy:
+			if (App->modLinkingContext->getNetworkGameObject((*it).networkId) != nullptr)
+				server->destroy((*it).networkId);
+			break;
+		default:
+			break;
+		}
+	}
 }

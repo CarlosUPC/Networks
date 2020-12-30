@@ -4,6 +4,8 @@
 // TODO(you): Reliability on top of UDP lab session
 
 class DeliveryManager;
+class ReplicationManagerServer;
+struct ReplicationCommand;
 
 class DeliveryDelegate
 {
@@ -12,11 +14,16 @@ public:
 	virtual void OnDeliveryFailure(DeliveryManager* delManager) = 0;
 };
 
-class DeliveryDelegateDummy : public DeliveryDelegate
+class DeliveryDelegateServer : public DeliveryDelegate
 {
 public:
-	void OnDeliverySuccess(DeliveryManager* delManager);
-	void OnDeliveryFailure(DeliveryManager* delManager);
+	DeliveryDelegateServer(ReplicationManagerServer* replicationServer);
+	void OnDeliverySuccess(DeliveryManager* delManager) override;
+	void OnDeliveryFailure(DeliveryManager* delManager) override;
+private:
+	ReplicationManagerServer* server;
+	std::vector<ReplicationCommand> commands;
+	std::unordered_map<uint32, ReplicationCommand> map;
 };
 
 struct Delivery
@@ -30,6 +37,9 @@ struct Delivery
 class DeliveryManager
 {
 public:
+	DeliveryManager();
+	~DeliveryManager();
+
 	//For senders to write a new seq. numbers into a packet.
 	Delivery* writeSequenceNumber(OutputMemoryStream& packet);
 
