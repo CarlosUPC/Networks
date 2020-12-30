@@ -55,7 +55,7 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastInputDelivery = 0.0f;
 	secondsDeathTimer = 0.0f;
 	
-
+	died = false;
 	lastPacketReceivedTime = Time.time;
 
 	replicationManager = {};
@@ -194,46 +194,7 @@ void ModuleNetworkingClient::onGui()
 				ImGui::EndPopup();
 			}
 		}
-		/*if (player != nullptr)
-		{
-			if (player->die)
-			{
-				
-				ImGui::OpenPopup("GAME OVER");
-
-				if (ImGui::BeginPopupModal("GAME OVER", nullptr, ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize))
-				{
-					
-
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.2f, 0.2f, 1.0f));
-					ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-					ImGui::SetCursorPosX( 180 / 2 - ImGui::CalcTextSize("GAME OVER").x / 2);
-					ImGui::Text("GAME OVER");
-					ImGui::Separator();
-					ImGui::PopStyleColor();
-
-					ImGui::NewLine();
-
-					if (ImGui::Button("Return to lobby", { 170, 35 }))
-					{
-						secondsDeathTimer = 0.0f;
-						disconnect();
-					}
-
-					const float death_time = 5.0f;
-					if (secondsDeathTimer >= death_time)
-					{
-						secondsDeathTimer = 0.0f;
-						disconnect();
-					}
-					secondsDeathTimer += Time.deltaTime;
-
-
-					ImGui::EndPopup();
-				}				
-			}
-
-		}*/
+		
 	}
 }
 
@@ -276,16 +237,9 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		if (message == ServerMessage::Replication)
 		{
 			if (deliveryManager.processSequenceNumber(packet))
-				replicationManager.read(packet);
+				replicationManager.read(packet, this);
 
-			else //Empty the packet without reading the content
-			{
-				char temp;
-				while (packet.RemainingByteCount() > sizeof(uint32))
-					packet >> temp;
-			}
-
-			packet >> inputDataFront;
+			
 
 			//CLIENT SIDE PREDICTION ---- Reapply inputs not processed by the server
 
@@ -360,7 +314,7 @@ void ModuleNetworkingClient::onUpdate()
 		secondsSinceLastPing += Time.deltaTime;
 		secondsSinceLastInputDelivery += Time.deltaTime;
 
-		if (inputDataBack - inputDataFront < ArrayCount(inputData))
+		if (inputDataBack - inputDataFront <= ArrayCount(inputData))
 		{
 			//Create new input packet
 			uint32 currentInputData = inputDataBack++;
@@ -378,7 +332,7 @@ void ModuleNetworkingClient::onUpdate()
 			}*/
 
 			// Create packet (if there's input and the input delivery interval exceeded)
-			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
+			if (secondsSinceLastInputDelivery >= inputDeliveryIntervalSeconds)
 			{
 				secondsSinceLastInputDelivery = 0.0f;
 
@@ -418,7 +372,7 @@ void ModuleNetworkingClient::onUpdate()
 			packet << ClientMessage::Ping;
 
 			deliveryManager.writeSequenceNumbersPendingAck(packet); //Send ack numbers to server
-
+			deliveryManager.processTimedOutPackets();
 
 			sendPacket(packet, serverAddress);
 			DLOG("Client send Ping message");
@@ -433,8 +387,7 @@ void ModuleNetworkingClient::onUpdate()
 		if (playerGameObject != nullptr)
 		{
 			App->modRender->cameraPosition = playerGameObject->position;
-			//Process new input: Client Side
-			//playerGameObject->behaviour->onInput(Input);
+		
 		}
 		else
 		{
