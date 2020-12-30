@@ -2,10 +2,10 @@
 
 // TODO(you): World state replication lab session
 
-void ReplicationManagerClient::read(const InputMemoryStream& packet)
+void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetworkingClient* client)
 {
 
-	while (packet.RemainingByteCount() > sizeof(uint32))
+	while (packet.RemainingByteCount() > 0)
 	{
 		uint32 networkId;
 		ReplicationAction action;
@@ -29,6 +29,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				packet >> gameObject->size.x;
 				packet >> gameObject->size.y;
 
+				gameObject->final_position = gameObject->initial_position = gameObject->position;
+				gameObject->final_angle = gameObject->initial_angle = gameObject->angle;
 
 				//Add Sprite
 				gameObject->sprite = App->modRender->addSprite(gameObject);
@@ -85,14 +87,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (gameObject != nullptr)
 			{
-				//packet >> gameObject->position.x;
-				//packet >> gameObject->position.y;
-				//packet >> gameObject->angle;
+				
 
-				//vec2 _position;
-				//float _angle;
-
-				if (networkId == App->modNetClient->getPlayerNetworkID())
+				/*if (networkId == App->modNetClient->getPlayerNetworkID())
 				{
 					packet >> gameObject->position.x;
 					packet >> gameObject->position.y;
@@ -105,7 +102,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 					
 
 					continue;
-				}
+				}*/
 
 				packet >> gameObject->final_position.x;
 				packet >> gameObject->final_position.y;
@@ -114,24 +111,37 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet)
 				packet >> gameObject->die;
 				packet >> gameObject->ultimate;
 
-				if(gameObject->die) //Destroy gameObject from other clients
-				{
-					App->modLinkingContext->unregisterNetworkGameObject(gameObject);
-					Destroy(gameObject);
-				}
+				
 				
 
 				gameObject->initial_position = gameObject->position;
 				gameObject->initial_angle = gameObject->angle;
 
 
-				//gameObject->final_position = _position;
-				//gameObject->final_angle = _angle;
+				
 
-				gameObject->secondsElapsed = .0f;
+				gameObject->secondsElapsed = 0.0f;
 			}
 
 		}
+		else if (action == ReplicationAction::Input)
+		{
+			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (gameObject != nullptr)
+			{
+				//TODO: Set input data to clients
+				
+					
+					uint32 data = 0u;
+					packet >> data;
+
+					client->setInputDataFront(data);
+
+				
+
+			}
+		}
+
 		else if (action == ReplicationAction::Destroy)
 		{
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);

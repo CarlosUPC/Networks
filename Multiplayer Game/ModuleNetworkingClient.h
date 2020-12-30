@@ -16,6 +16,8 @@ public:
 
 	inline uint32 getPlayerNetworkID() const { return networkId; }
 
+	inline void setInputDataFront(uint32 input)  {  inputDataFront = input; }
+
 private:
 
 	//////////////////////////////////////////////////////////////////////

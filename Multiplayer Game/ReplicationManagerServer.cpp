@@ -27,6 +27,19 @@ void ReplicationManagerServer::update(uint32 networkId)
 		map[networkId] = command;
 }
 
+void ReplicationManagerServer::input(uint32 networkId, uint32 input)
+{
+	ReplicationCommand command;
+	command.action = ReplicationAction::Input;
+	command.networkId = networkId;
+	command.inputFrontData = input;
+
+	map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
+
+	//if (map.find(networkId) == map.end())
+		//map[networkId] = command;
+}
+
 void ReplicationManagerServer::destroy(uint32 networkId)
 {
 	ReplicationCommand command;
@@ -92,10 +105,23 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 			}
 
 		}
+		else if (command.action == ReplicationAction::Input)
+		{
+			//Get the object from LinkingContext
+			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(command.networkId);
+
+			//Serialize fields
+			if (gameObject != nullptr)
+			{
+				packet << it->second.inputFrontData;
+			}
+		}
+
 		else if (command.action == ReplicationAction::Destroy)
 		{
 			//Nothing else to do
 		}
+
 	}
 
 	map.clear(); //With this we are assuming reliability.

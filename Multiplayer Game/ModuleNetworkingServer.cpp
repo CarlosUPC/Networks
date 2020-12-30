@@ -169,8 +169,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 			if (proxy != nullptr && IsValid(proxy->gameObject))
 			{
 				// TODO(you): Reliability on top of UDP lab session
-
-				// Read input data
+				
 				while (packet.RemainingByteCount() > 0)
 				{
 					InputPacketData inputData;
@@ -181,6 +180,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 
 					if (inputData.sequenceNumber >= proxy->nextExpectedInputSequenceNumber)
 					{
+						
+
 						proxy->gamepad.horizontalAxis = inputData.horizontalAxis;
 						proxy->gamepad.verticalAxis = inputData.verticalAxis;
 						unpackInputControllerButtons(inputData.buttonBits, proxy->gamepad);
@@ -188,6 +189,8 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 						proxy->nextExpectedInputSequenceNumber = inputData.sequenceNumber + 1;
 					}
 				}
+			
+				proxy->replicationManager.input(proxy->gameObject->networkId, proxy->nextExpectedInputSequenceNumber);
 			}
 		}
 		// TODO(you): UDP virtual connection lab session
@@ -260,7 +263,7 @@ void ModuleNetworkingServer::onUpdate()
 
 				// TODO(you): World state replication lab session
 
-				if (secondsSinceLastReplication >= REPLICATION_INTERVAL_SECONDS /*&& !clientProxy.replicationManager.isEmpty()*/)
+				if (secondsSinceLastReplication >= REPLICATION_INTERVAL_SECONDS && !clientProxy.replicationManager.isEmpty())
 				{
 					//secondsSinceLastReplication = 0.0f;
 
@@ -271,13 +274,13 @@ void ModuleNetworkingServer::onUpdate()
 
 					clientProxy.replicationManager.write(packet); // Replication update
 
-					packet << clientProxy.nextExpectedInputSequenceNumber; // Redudancy notification
+					//packet << clientProxy.nextExpectedInputSequenceNumber; // Redudancy notification
 
 					sendPacket(packet, clientProxy.address);
 					DLOG("Server send Replication packet");
 				}
 				// TODO(you): Reliability on top of UDP lab session
-				clientProxy.deliveryManager.processTimedOutPackets();
+				//clientProxy.deliveryManager.processTimedOutPackets();
 
 				if (secondsSinceLastRank >= RANKING_INTERVAL_SECONDS)
 				{

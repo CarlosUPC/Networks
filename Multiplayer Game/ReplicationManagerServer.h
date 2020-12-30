@@ -4,13 +4,15 @@
 
 enum class ReplicationAction
 {
-	None, Create, Update, Destroy
+	None, Create, Update, Input, Destroy
 };
 
 struct ReplicationCommand
 {
 	ReplicationAction action;
 	uint32 networkId;
+
+	uint32 inputFrontData = 0u;
 };
 
 class ReplicationManagerServer
@@ -18,6 +20,7 @@ class ReplicationManagerServer
 public:
 	void create(uint32 networkId);
 	void update(uint32 networkId);
+	void input(uint32 networkId, uint32 data = 0u);
 	void destroy(uint32 networkId);
 
 	void write(OutputMemoryStream& packet);
