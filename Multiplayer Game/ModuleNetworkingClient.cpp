@@ -283,6 +283,18 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 				player->lifebar = nullptr;
 			}
 		}
+
+		if (message == ServerMessage::Life)
+		{
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			packet >> playerGameObject->life;
+		}
+
+		if (message == ServerMessage::Kill)
+		{
+			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+			packet >> playerGameObject->kills;
+		}
 		// TODO(you): Reliability on top of UDP lab session
 	}
 }

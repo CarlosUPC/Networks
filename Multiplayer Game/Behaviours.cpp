@@ -163,6 +163,8 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 			{
 				hitPoints--;
 				NetworkUpdate(gameObject);
+				App->modNetServer->updateClientProxyByGameObject(gameObject, false);
+				
 			}
 
 			//float size = 30 + 50.0f * Random.next();
@@ -180,6 +182,8 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 				{
 					++killer->kills;
 					NetworkUpdate(killer);
+					App->modNetServer->updateClientProxyByGameObject(gameObject, true);
+					
 				}
 
 

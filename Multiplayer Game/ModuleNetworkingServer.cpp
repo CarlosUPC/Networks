@@ -464,6 +464,39 @@ void ModuleNetworkingServer::disconnectClientProxyByGameObject(GameObject* objec
 	}
 }
 
+void ModuleNetworkingServer::updateClientProxyByGameObject(GameObject* object, bool kill)
+{
+
+	ModuleNetworkingServer::ClientProxy* proxy = GetClientProxyByGameObject(object);
+
+	if (proxy)
+	{
+		if (kill)
+		{
+			OutputMemoryStream packet;
+			packet << PROTOCOL_ID;
+			packet << ServerMessage::Kill;
+			packet << object->kills;
+
+
+			sendPacket(packet, proxy->address);
+		}
+		else
+		{
+			OutputMemoryStream packet;
+			packet << PROTOCOL_ID;
+			packet << ServerMessage::Life;
+			packet << object->life;
+		
+
+			sendPacket(packet, proxy->address);
+
+		}
+
+	
+	}
+}
+
 ModuleNetworkingServer::ClientProxy* ModuleNetworkingServer::GetClientProxyByGameObject(GameObject* object)
 {
 	for (int i = 0; i < MAX_CLIENTS; i++)

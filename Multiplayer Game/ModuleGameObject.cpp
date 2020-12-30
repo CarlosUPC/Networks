@@ -43,12 +43,12 @@ bool ModuleGameObject::preUpdate()
 				}
 
 
-				if (gameObject.lifebar != nullptr  /*gameObject.isLifebar*/)
+				if (gameObject.lifebar != nullptr)
 				{
 					gameObject.lifebar->position = gameObject.position + vec2{ -50.0f, -50.0f };
 
 					const float alpha = 0.8f;
-					const int height = 6;
+					const int height = 5;
 					if (gameObject.life == 100)
 					{
 						gameObject.lifebar->sprite->color = vec4{ 0.0f, 1.0f, 0.0f, alpha };

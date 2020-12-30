@@ -85,6 +85,8 @@ public:
 
 	void disconnectClientProxyByGameObject(GameObject* object);
 	ClientProxy* GetClientProxyByGameObject(GameObject* object);
+
+	void updateClientProxyByGameObject(GameObject* object, bool kill);
 private:
 
 	//////////////////////////////////////////////////////////////////////
