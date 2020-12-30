@@ -1,5 +1,5 @@
 # BattleShip Royale
-BattleShip Royale is an amazing multiplayer game where you pilot a spaceship and have to defeat all the foes you encountered in order to keep alive as long as possible.
+BattleShip Royale is an amazing multiplayer game where you pilot a spaceship and have to defeat all the foes you will encounter in order to keep alive as long as possible.
 
 ## Members
 
@@ -45,6 +45,10 @@ Keep your spaceship alive as long as you can while destroying other ships to bec
 
 ## Bugs / Issues
 
+  * A we deal with techniques to compensate for lag, and bandwidth usage is a real concern, we send input notification data from server with every replication packet. 
+  That means a slower response to have all the clients updated.
+  * There is a loss of input data with high latency simulation
+    
 
 
 
