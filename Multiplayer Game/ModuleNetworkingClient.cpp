@@ -276,6 +276,12 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 		if (message == ServerMessage::Death)
 		{
 			died = true;
+			GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (player->lifebar != nullptr)
+			{
+				Destroy(player->lifebar);
+				player->lifebar = nullptr;
+			}
 		}
 		// TODO(you): Reliability on top of UDP lab session
 	}
@@ -412,6 +418,10 @@ void ModuleNetworkingClient::onDisconnect()
 
 	for (uint32 i = 0; i < networkGameObjectsCount; ++i)
 	{
+		if (networkGameObjects[i]->lifebar != nullptr)
+		{
+			Destroy(networkGameObjects[i]->lifebar);
+		}
 		Destroy(networkGameObjects[i]);
 	}
 

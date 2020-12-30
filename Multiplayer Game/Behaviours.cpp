@@ -157,7 +157,8 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 		if (isServer)
 		{
 			NetworkDestroy(c2.gameObject); // Destroy the laser
-		
+			gameObject->life -= 25;
+
 			if (hitPoints > 0)
 			{
 				hitPoints--;

@@ -28,15 +28,54 @@ bool ModuleGameObject::preUpdate()
 
 			if (gameObject.state == GameObject::UPDATING)
 			{
-				gameObject.secondsElapsed += Time.deltaTime;
+				if (!gameObject.isLifebar)
+				{
+					gameObject.secondsElapsed += Time.deltaTime;
 
-				float ratio = gameObject.secondsElapsed / REPLICATION_INTERVAL_SECONDS;
+					float ratio = gameObject.secondsElapsed / REPLICATION_INTERVAL_SECONDS;
 
-				if (ratio > 1)
-					ratio = 1;
+					if (ratio > 1)
+						ratio = 1;
 
-				gameObject.position = ((gameObject.final_position - gameObject.initial_position) * ratio) + gameObject.initial_position;
-				gameObject.angle = ((gameObject.final_angle - gameObject.initial_angle) * ratio) + gameObject.initial_angle;
+					gameObject.position = ((gameObject.final_position - gameObject.initial_position) * ratio) + gameObject.initial_position;
+					gameObject.angle = ((gameObject.final_angle - gameObject.initial_angle) * ratio) + gameObject.initial_angle;
+
+				}
+
+
+				if (gameObject.lifebar != nullptr  /*gameObject.isLifebar*/)
+				{
+					gameObject.lifebar->position = gameObject.position + vec2{ -50.0f, -50.0f };
+
+					const float alpha = 0.8f;
+					const int height = 6;
+					if (gameObject.life == 100)
+					{
+						gameObject.lifebar->sprite->color = vec4{ 0.0f, 1.0f, 0.0f, alpha };
+						gameObject.lifebar->size = { 80, height };
+					}
+					else if (gameObject.life == 75)
+					{
+						gameObject.lifebar->sprite->color = vec4{ 1.0f, 1.0f, 0.0f, alpha };
+						gameObject.lifebar->size = { 60, height };
+					}
+					else if (gameObject.life == 50)
+					{
+						gameObject.lifebar->sprite->color = vec4{ 1.0f, 0.75f, 0.0f, alpha };
+						gameObject.lifebar->size = { 40, height };
+					}
+					else if (gameObject.life == 25)
+					{
+						gameObject.lifebar->sprite->color = vec4{ 1.0f, 0.5f, 0.0f, alpha };
+						gameObject.lifebar->size = { 20, height };
+					}
+					else if (gameObject.life == 0)
+					{
+						gameObject.lifebar->sprite->color = vec4{ 1.0f, 0.0f, 0.0f, alpha };
+						gameObject.lifebar->size = { 1, height };
+					}
+				}
+
 			}
 			
 		}
@@ -57,6 +96,8 @@ bool ModuleGameObject::update()
 			destroyEntry.delaySeconds -= Time.deltaTime;
 			if (destroyEntry.delaySeconds <= 0.0f)
 			{
+				Destroy(destroyEntry.object->lifebar);
+				destroyEntry.object->lifebar = nullptr;
 				Destroy(destroyEntry.object);
 				destroyEntry.object = nullptr;
 			}

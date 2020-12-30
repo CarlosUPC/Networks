@@ -40,6 +40,9 @@ struct GameObject
 	bool die = false;
 	//float ultimateTimer = 0.0f;
 	bool ultimate = false;
+	uint32 life = 100;
+	GameObject* lifebar = nullptr;
+	bool isLifebar = false;
 	// NOTE(jesus): Don't use in gameplay systems (use Instantiate, Destroy instead)
 	enum State {
 		NON_EXISTING,

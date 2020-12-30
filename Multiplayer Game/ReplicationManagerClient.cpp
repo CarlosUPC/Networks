@@ -28,6 +28,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 				packet >> gameObject->angle;
 				packet >> gameObject->size.x;
 				packet >> gameObject->size.y;
+				packet >> gameObject->life;
 
 				gameObject->final_position = gameObject->initial_position = gameObject->position;
 				gameObject->final_angle = gameObject->initial_angle = gameObject->angle;
@@ -75,6 +76,17 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 					gameObject->behaviour = new Spaceship();
 					gameObject->behaviour->gameObject = gameObject;
 					gameObject->sprite->order = 2;
+
+					//Add lifebar
+					if (gameObject->lifebar == nullptr)
+					{
+						gameObject->lifebar = Instantiate();
+						//App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject->lifebar, networkId);
+						gameObject->lifebar->sprite = App->modRender->addSprite(gameObject->lifebar);
+						gameObject->lifebar->sprite->pivot = vec2{ 0.0f, 0.5f };
+						gameObject->lifebar->sprite->order = 1;
+						gameObject->lifebar->isLifebar = true;
+					}
 				}
 
 
@@ -108,8 +120,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 				packet >> gameObject->final_position.y;
 				packet >> gameObject->final_angle;
 				packet >> gameObject->kills;
-				packet >> gameObject->die;
 				packet >> gameObject->ultimate;
+				packet >> gameObject->life;
 
 				
 				
@@ -121,6 +133,8 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 				
 
 				gameObject->secondsElapsed = 0.0f;
+
+				
 			}
 
 		}
@@ -147,6 +161,14 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (gameObject != nullptr)
 			{
+
+				if (gameObject->lifebar != nullptr)
+				{
+					//App->modLinkingContext->unregisterNetworkGameObject(gameObject->lifebar);
+					Destroy(gameObject->lifebar);
+					gameObject->lifebar = nullptr;
+				}
+
 				App->modLinkingContext->unregisterNetworkGameObject(gameObject);
 				Destroy(gameObject);
 			}

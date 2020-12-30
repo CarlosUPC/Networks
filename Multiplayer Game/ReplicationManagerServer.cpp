@@ -77,6 +77,7 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << gameObject->angle;
 				packet << gameObject->size.x;
 				packet << gameObject->size.y;
+				packet << gameObject->life;
 
 				if (gameObject->sprite->texture == App->modResources->spacecraft1)
 					packet << (uint8)1;
@@ -100,8 +101,9 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << gameObject->position.y;
 				packet << gameObject->angle;
 				packet << gameObject->kills;
-				packet << gameObject->die;
+				//packet << gameObject->die;
 				packet << gameObject->ultimate;
+				packet << gameObject->life;
 			}
 
 		}
