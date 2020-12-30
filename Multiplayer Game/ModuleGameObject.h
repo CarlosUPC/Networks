@@ -80,10 +80,6 @@ public:
 
 	static void Destroy(GameObject * gameObject, float delaySeconds);
 
-	//Entity interpolation static funcs
-	static vec2 Interpolate(vec2& initial, vec2 & final, float timeElapsed);
-	static float Interpolate(float initial, float final, float timeElapsed);
-
 	GameObject gameObjects[MAX_GAME_OBJECTS] = {};
 
 private:

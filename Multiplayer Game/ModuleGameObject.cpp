@@ -26,25 +26,19 @@ bool ModuleGameObject::preUpdate()
 		if (App->modNetClient->isConnected())
 		{
 
-
-			//Entity interpolation
-			if (gameObject.networkId != 0 && gameObject.networkId != App->modNetClient->getPlayerNetworkID())
+			if (gameObject.state == GameObject::UPDATING)
 			{
+				gameObject.secondsElapsed += Time.deltaTime;
 
-				if (gameObject.secondsElapsed != -1.0f)
-				{
-					if (gameObject.secondsElapsed > 0.2f)
-					{
-						gameObject.secondsElapsed = -1.0f;
-						continue;
-					}
+				float ratio = gameObject.secondsElapsed / REPLICATION_INTERVAL_SECONDS;
 
-					gameObject.position = Interpolate(gameObject.initial_position, gameObject.final_position, gameObject.secondsElapsed);
-					gameObject.angle = Interpolate(gameObject.initial_angle, gameObject.final_angle, gameObject.secondsElapsed);
+				if (ratio > 1)
+					ratio = 1;
 
-					gameObject.secondsElapsed += Time.deltaTime;
-				}
+				gameObject.position = ((gameObject.final_position - gameObject.initial_position) * ratio) + gameObject.initial_position;
+				gameObject.angle = ((gameObject.final_angle - gameObject.initial_angle) * ratio) + gameObject.initial_angle;
 			}
+			
 		}
 	}
 
@@ -129,24 +123,6 @@ void ModuleGameObject::Destroy(GameObject * gameObject, float delaySeconds)
 			break;
 		}
 	}
-}
-
-vec2 ModuleGameObject::Interpolate(vec2& initial, vec2 & final, float timeElapsed)
-{
-	if (timeElapsed > 0.2f)
-		return final;
-
-	vec2 diff = final - initial;
-	return (diff * timeElapsed / 0.2f) + initial;
-}
-
-float ModuleGameObject::Interpolate(float initial, float final, float timeElapsed)
-{
-	if (timeElapsed > 0.2f)
-		return final;
-
-	float diff = final - initial;
-	return (diff * timeElapsed / 0.2f) + initial;
 }
 
 GameObject * Instantiate()
