@@ -64,7 +64,8 @@ i improved the replication system creating a new action called input as a notifi
  ### Entity Interpolation 
  * **Contributor**: Carlos
  * **Completeness degree**: Completely Archived
- * **Result accomplished**: 
+ * **Result accomplished**: The interpolation works well and there is no kind of flickering or teleportation of positions and angle. I don't know if I'm crazy but it gives me the feeling that it is not as immediate as it looks on the server, maybe it is because all the input is processed on the server and there is a small latency since we first send the inputs from the client, the server runs them and then send the replication to update the client. Also it can be by the ratio/percentage that is calculated in the local interpolation. You will see.
+ 
     
     
 
