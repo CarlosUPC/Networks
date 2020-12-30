@@ -33,6 +33,7 @@ Keep your spaceship alive as long as you can while destroying other ships to bec
 
     * game accepts client connections
     * game handles join/leave events
+    * Lag compensation: Not achvied
 * Carlos:
 
 ## Technical Features
