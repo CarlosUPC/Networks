@@ -27,15 +27,15 @@ bool DeliveryManager::processSequenceNumber(const InputMemoryStream& packet)
 	uint32 seqNumber;
 	packet >> seqNumber;
 
-	if (seqNumber == nextInSeqNumber)
+	if (seqNumber >= nextInSeqNumber)
 	{
-		nextInSeqNumber++;
+		nextInSeqNumber = seqNumber + 1;
 		pendingAcks.push_back(seqNumber);
 		return true;
 	}
 	else
 	{
-		pendingAcks.push_back(seqNumber);
+		//pendingAcks.push_back(seqNumber);
 		return false;
 	}
 }
@@ -74,9 +74,10 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 				if (delivery->delegate)
 					delivery->delegate->OnDeliverySuccess(this);
 
+				pendingDeliveries.remove(delivery);
 				delete delivery->delegate;
 				delete delivery;
-				pendingDeliveries.erase(it);
+				//pendingDeliveries.erase(it);
 				break;
 			}
 		}
@@ -85,26 +86,23 @@ void DeliveryManager::processAckdSequenceNumbers(const InputMemoryStream& packet
 
 void DeliveryManager::processTimedOutPackets()
 {
-	for (std::list<Delivery*>::iterator it = pendingDeliveries.begin(); it != pendingDeliveries.end();)
+	
+	std::list<std::list<Delivery*>::iterator> toDelete;
+
+	for (std::list<Delivery*>::iterator it = pendingDeliveries.begin(); it != pendingDeliveries.end(); ++it)
 	{
-		Delivery* delivery = *it;
-		if (Time.time - delivery->dispatchTime >= PACKET_DELIVERY_TIMEOUT_SECONDS)
+		if (Time.time - (*it)->dispatchTime >= PACKET_DELIVERY_TIMEOUT_SECONDS)
 		{
-			if (delivery->delegate)
-				delivery->delegate->OnDeliveryFailure(this);
-
-			delete delivery->delegate;
-			delete delivery;
-			it = pendingDeliveries.erase(it);
-			
-			//break;
-
+			(*it)->delegate->OnDeliveryFailure(this);
+			toDelete.push_back(it);
+			delete (*it)->delegate;
+			delete* it;
 		}
-		else
-		{
-			it++;
-		}
-		
+	}
+
+	for (auto mode : toDelete)
+	{
+		pendingDeliveries.erase(mode);
 	}
 }
 
