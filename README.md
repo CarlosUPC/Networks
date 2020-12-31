@@ -85,7 +85,8 @@ i improved the replication system creating a new action called input as a notifi
  ### Client-side prediction with server reconciliation
  * **Contributor**: Carlos
  * **Completeness degree**: Completely Archived
- * **Result accomplished**: 
+ * **Result accomplished**: The client-side prediction is performed after the client recieves the replication packet with his last processed input updated from the server state. After
+ received it, we iterate the input array in case of inputdataback was incremented, so there are inputs which need to be re-applied since they are not yet processed by the server in order to eliminate visible desynchronization issue.
  
  ### Entity Interpolation 
  * **Contributor**: Carlos
