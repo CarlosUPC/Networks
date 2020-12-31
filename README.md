@@ -27,13 +27,38 @@ Keep your spaceship alive as long as you can while destroying other ships to bec
    * Left Arrow: Basic shoot
    * Right Arrow: Ultimate shoot
 
-## Technical Features
+## Members
     
 * Alexandru:
 
-    * game accepts client connections
-    * game handles join/leave events
-    * Lag compensation: Not achvied
+## Technical Features
+
+### Game accepts client connections 
+
+* **Contributor**: Alexandru
+* **Completeness degree**: Achived
+* **Result accomplished**: The game accepts clients and assignes them a ID that is handeled by the server then assignes them the corresponding information
+
+### Game handles join/leave events
+* **Contributor**: Alexandru
+* **Completeness degree**: Achived
+* **Result accomplished**: Clients can disconnect and connect at freewill
+
+### Lag compensation: Not achvied
+* **Contributor**: Alexandru
+* **Completeness degree**: Tried but dissmies due that couldn't make it work
+* **Result accomplished**: Tried to create a system that keeps a history of all recent player positions for one second so the system can estimate at what time the commando was created,
+			   the math would be: CommandExeTime = CurrentServTime - Packet Latency - Client View 
+			   This would move all other players back to where they were at the command execution time, then the user command would be exectued and finaly after the command is
+			   processed they players would revert to their original position.
+
+* **Helped with imGui and gameplay**
+			    
+		           
+		           
+
+
+
 * Carlos:
 
 ## Technical Features
