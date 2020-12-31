@@ -163,56 +163,31 @@ void Spaceship::onCollisionTriggered(Collider &c1, Collider &c2)
 			{
 				hitPoints--;
 				NetworkUpdate(gameObject);
-				App->modNetServer->updateClientProxyByGameObject(gameObject, false);
+				App->modNetServer->updateClientProxyByGameObject(gameObject, false); //Force updating client new state
 				
 			}
 
-			//float size = 30 + 50.0f * Random.next();
-			//vec2 position = gameObject->position + 50.0f * vec2{Random.next() - 0.5f, Random.next() - 0.5f};
+		
 
 			if (hitPoints <= 0)
 			{
-				// Centered big explosion
-				//size = 250.0f + 100.0f * Random.next();
-				//position = gameObject->position;
-
+				
 				// Get kill point
 				GameObject* killer = App->modNetServer->getNetworkObjectByTag(c2.gameObject->tag);
 				if (killer != nullptr)
 				{
 					++killer->kills;
 					NetworkUpdate(killer);
-					App->modNetServer->updateClientProxyByGameObject(gameObject, true);
+					App->modNetServer->updateClientProxyByGameObject(gameObject, true);//Force updating client new state
 					
 				}
 
 
-				// Victim died
-				//gameObject->die = true;
-
 				App->modNetServer->disconnectClientProxyByGameObject(gameObject);
 
-				//NetworkUpdate(gameObject);
-				//NetworkDestroy(gameObject); //Commented for disconnect client (maybe is not good idea)
 			}
 
-			/*GameObject *explosion = NetworkInstantiate();
-			explosion->position = position;
-			explosion->size = vec2{ size, size };
-			explosion->angle = 365.0f * Random.next();
-
-			explosion->sprite = App->modRender->addSprite(explosion);
-			explosion->sprite->texture = App->modResources->explosion1;
-			explosion->sprite->order = 100;
-
-			explosion->animation = App->modRender->addAnimation(explosion);
-			explosion->animation->clip = App->modResources->explosionClip;
-
-			NetworkDestroy(explosion, 2.0f);*/
-
-			// NOTE(jesus): Only played in the server right now...
-			// You need to somehow make this happen in clients
-			//App->modSound->playAudioClip(App->modResources->audioClipExplosion);
+		
 		}
 	}
 }

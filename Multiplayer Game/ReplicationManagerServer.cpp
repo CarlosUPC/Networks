@@ -9,8 +9,7 @@ void ReplicationManagerServer::create(uint32 networkId)
 	command.action = ReplicationAction::Create;
 	command.networkId = networkId;
 
-	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
-
+	
 	if (map.find(networkId) == map.end())
 		map[networkId] = command;
 }
@@ -21,8 +20,7 @@ void ReplicationManagerServer::update(uint32 networkId)
 	command.action = ReplicationAction::Update;
 	command.networkId = networkId;
 
-	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
-
+	
 	if (map.find(networkId) == map.end())
 		map[networkId] = command;
 }
@@ -46,9 +44,6 @@ void ReplicationManagerServer::destroy(uint32 networkId)
 	command.action = ReplicationAction::Destroy;
 	command.networkId = networkId;
 
-	//map.insert(std::pair<uint32, ReplicationCommand>(networkId, command));
-
-	//if (map.find(networkId) == map.end())
 	map[networkId] = command;
 }
 
@@ -101,7 +96,6 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << gameObject->position.y;
 				packet << gameObject->angle;
 				packet << gameObject->kills;
-				//packet << gameObject->die;
 				packet << gameObject->ultimate;
 				packet << gameObject->life;
 			}
@@ -126,7 +120,7 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 
 	}
 
-	map.clear(); //With this we are assuming reliability.
+	map.clear(); 
 }
 
 bool ReplicationManagerServer::isEmpty() const

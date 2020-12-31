@@ -197,11 +197,9 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 		else if (message == ClientMessage::Ping && proxy)
 		{
 			proxy->deliveryManager.processAckdSequenceNumbers(packet);
-		}
-		if (proxy != nullptr)
-		{
 			proxy->lastPacketReceivedTime = Time.time;
 		}
+		
 
 	}
 }
@@ -213,10 +211,7 @@ void ModuleNetworkingServer::onUpdate()
 	if (state == ServerState::Listening)
 	{
 
-		//secondsSinceLastPing += Time.deltaTime;
-		//secondsSinceLastReplication += Time.deltaTime;
-
-
+	
 		// Handle networked game object destructions
 		for (DelayedDestroyEntry &destroyEntry : netGameObjectsToDestroyWithDelay)
 		{
@@ -244,7 +239,7 @@ void ModuleNetworkingServer::onUpdate()
 
 				if (secondsSinceLastPing >= PING_INTERVAL_SECONDS)
 				{
-					//secondsSinceLastPing = 0.0f;
+					
 
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
@@ -265,25 +260,25 @@ void ModuleNetworkingServer::onUpdate()
 
 				if (secondsSinceLastReplication >= REPLICATION_INTERVAL_SECONDS && !clientProxy.replicationManager.isEmpty())
 				{
-					//secondsSinceLastReplication = 0.0f;
-
+					
 					OutputMemoryStream packet;
 					packet << PROTOCOL_ID;
 					packet << ServerMessage::Replication;
 
-					Delivery* delivery = clientProxy.deliveryManager.writeSequenceNumber(packet); // Delivery notification
+					// Delivery notification
+					Delivery* delivery = clientProxy.deliveryManager.writeSequenceNumber(packet); 
 					if (delivery != nullptr)
 						delivery->delegate = new DeliveryDelegateServer(&clientProxy.replicationManager);
 
-					clientProxy.replicationManager.write(packet); // Replication update
+					// Replication update
+					clientProxy.replicationManager.write(packet); 
 
-					//packet << clientProxy.nextExpectedInputSequenceNumber; // Redudancy notification
-
+					
 					sendPacket(packet, clientProxy.address);
 					DLOG("Server send Replication packet");
 				}
 				// TODO(you): Reliability on top of UDP lab session
-				//clientProxy.deliveryManager.processTimedOutPackets();
+				
 
 				if (secondsSinceLastRank >= RANKING_INTERVAL_SECONDS)
 				{

@@ -124,7 +124,7 @@ void ModuleNetworkingClient::onGui()
 			}
 			if (ImGui::CollapsingHeader("PowerUp", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				//GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
+				
 				if (player != nullptr) {
 					if(!player->ultimate)
 						ImGui::Text(" - Ultimate in cooldown");
@@ -201,7 +201,7 @@ void ModuleNetworkingClient::onGui()
 void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, const sockaddr_in &fromAddress)
 {
 	// TODO(you): UDP virtual connection lab session
-	lastPacketReceivedTime = Time.time;
+	
 	
 	uint32 protoId;
 	packet >> protoId;
@@ -230,7 +230,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	{
 		if (message == ServerMessage::Ping)
 		{
-			//lastPacketReceivedTime = Time.time;
+			lastPacketReceivedTime = Time.time;
 		}
 		
 		// TODO(you): World state replication lab session
@@ -240,8 +240,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 				replicationManager.read(packet, this);
 
 			
-
-			//CLIENT SIDE PREDICTION ---- Reapply inputs not processed by the server
+			//CLIENT SIDE PREDICTION ---- Reapply inputs not processed yet by the server
 
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr)
@@ -295,7 +294,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			packet >> playerGameObject->kills;
 		}
-		// TODO(you): Reliability on top of UDP lab session
+		
 	}
 }
 
@@ -342,7 +341,7 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.verticalAxis = Input.verticalAxis;
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
 
-			//Process the new input: Client Side
+			//Client Side Input for Local Simulations
 			/*GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr)
 			{
@@ -366,11 +365,8 @@ void ModuleNetworkingClient::onUpdate()
 					packet << inputPacketData.verticalAxis;
 					packet << inputPacketData.buttonBits;
 				}
-
-				// Clear the queue
-				//inputDataFront = inputDataBack;
-
 				sendPacket(packet, serverAddress);
+				DLOG("Client send Input packet");
 			}
 		}
 		else inputDataFront = inputDataBack;
@@ -393,7 +389,7 @@ void ModuleNetworkingClient::onUpdate()
 			deliveryManager.processTimedOutPackets();
 
 			sendPacket(packet, serverAddress);
-			DLOG("Client send Ping message");
+			DLOG("Client send Ping packet");
 
 		}
 

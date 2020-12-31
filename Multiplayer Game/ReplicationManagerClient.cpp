@@ -55,18 +55,18 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 					break;
 				}
 
-				if (spaceShipType == 0)//Laser
+				//Add Laser
+				if (spaceShipType == 0)
 				{
 					//Add Collider
 					gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
 					gameObject->collider->isTrigger = true;
 					gameObject->sprite->order = 1;
-					//Add Behaviour
-					//gameObject->behaviour = new Laser();
-					//gameObject->behaviour->gameObject = gameObject;
+					
 
 				}
-				else //Player
+				//Add Player
+				else 
 				{
 					//Add Collider
 					gameObject->collider = App->modCollision->addCollider(ColliderType::Player, gameObject);
@@ -81,7 +81,6 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 					if (gameObject->lifebar == nullptr)
 					{
 						gameObject->lifebar = Instantiate();
-						//App->modLinkingContext->registerNetworkGameObjectWithNetworkId(gameObject->lifebar, networkId);
 						gameObject->lifebar->sprite = App->modRender->addSprite(gameObject->lifebar);
 						gameObject->lifebar->sprite->pivot = vec2{ 0.0f, 0.5f };
 						gameObject->lifebar->sprite->order = 1;
@@ -99,23 +98,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (gameObject != nullptr)
 			{
-				
-
-				/*if (networkId == App->modNetClient->getPlayerNetworkID())
-				{
-					packet >> gameObject->position.x;
-					packet >> gameObject->position.y;
-					packet >> gameObject->angle;
-					packet >> gameObject->kills;
-					packet >> gameObject->die;
-					packet >> gameObject->ultimate;
-
-					
-					
-
-					continue;
-				}*/
-
+			
 				packet >> gameObject->final_position.x;
 				packet >> gameObject->final_position.y;
 				packet >> gameObject->final_angle;
@@ -124,17 +107,11 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 				packet >> gameObject->life;
 
 				
-				
-
+				//Entity Interpolation
 				gameObject->initial_position = gameObject->position;
 				gameObject->initial_angle = gameObject->angle;
-
-
-				
-
 				gameObject->secondsElapsed = 0.0f;
 
-				
 			}
 
 		}
@@ -143,16 +120,9 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 			GameObject* gameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (gameObject != nullptr)
 			{
-				//TODO: Set input data to clients
-				
-					
 					uint32 data = 0u;
 					packet >> data;
-
 					client->setInputDataFront(data);
-
-				
-
 			}
 		}
 
@@ -164,7 +134,7 @@ void ReplicationManagerClient::read(const InputMemoryStream& packet, ModuleNetwo
 
 				if (gameObject->lifebar != nullptr)
 				{
-					//App->modLinkingContext->unregisterNetworkGameObject(gameObject->lifebar);
+					
 					Destroy(gameObject->lifebar);
 					gameObject->lifebar = nullptr;
 				}

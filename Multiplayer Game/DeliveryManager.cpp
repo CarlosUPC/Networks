@@ -3,8 +3,6 @@
 
 // TODO(you): Reliability on top of UDP lab session
 
-//#include "DeliveryManager.h"
-
 
 DeliveryManager::DeliveryManager()
 {
