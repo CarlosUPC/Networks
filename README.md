@@ -33,12 +33,12 @@ Keep your spaceship alive as long as you can while destroying other ships to bec
 ### Game accepts client connections 
 
 * **Contributor**: Alexandru
-* **Completeness degree**: Achived
+* **Completeness degree**: Completely Archived
 * **Result accomplished**: The game accepts clients and assignes them an ID that is handled by the server then assignes them the corresponding data.
 
 ### Game handles join/leave events
 * **Contributor**: Alexandru
-* **Completeness degree**: Achived
+* **Completeness degree**: Completely Archived
 * **Result accomplished**: Clients can disconnect and connect at freewill. At the beginning we had an issue related with replication manager since the clients don't 
 replicate properly in the create action when they were disconnected and reconnected again. It was solved declaring the manager at OnStart() function of the client Network module
 
