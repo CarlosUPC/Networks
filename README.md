@@ -27,12 +27,12 @@ Keep your spaceship alive as long as you can while destroying other ships to bec
    * Left Arrow: Basic shoot
    * Right Arrow: Ultimate shoot
 
-## Members
+
     
-* Alexandru:
+
 
 ## Technical Features
-
+* Alexandru:
 ### Game accepts client connections 
 
 * **Contributor**: Alexandru
@@ -52,17 +52,17 @@ Keep your spaceship alive as long as you can while destroying other ships to bec
 			   This would move all other players back to where they were at the command execution time, then the user command would be exectued and finaly after the command is
 			   processed they players would revert to their original position.
 
-* **Helped with imGui and gameplay**
+### **Helped with imGui and gameplay**
 			    
 		           
 		           
 
 
 
-* Carlos:
+
 
 ## Technical Features
-
+* Carlos:
  ### World state replication system 
   * **Contributor**: Carlos 
   * **Completeness degree**: Archived with known issue
