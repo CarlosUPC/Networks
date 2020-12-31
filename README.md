@@ -73,9 +73,9 @@ i improved the replication system creating a new action called input as a notifi
  * **Completeness degree**: Completely Archived
  * **Result accomplished**: The interpolation works well and there is no kind of flickering or teleportation of positions and angle. I don't know if I'm crazy but it gives me the feeling that it is not as immediate as it looks on the server, maybe it is because all the input is processed on the server and there is a small latency since we first send the inputs from the client, the server runs them and then send the replication to update the client. Also it can be by the ratio/percentage that is calculated in the local interpolation. You will see.
  
-### Lag compensation: Not achvied
+### Lag compensation
 * **Contributor**: Alexandru
-* **Completeness degree**: Tried but dissmies due that couldn't make it work
+* **Completeness degree**: Tried but not archived. Tried but dissmies due that couldn't make it work
 * **Result accomplished**: Tried to create a system that keeps a history of all recent player positions for one second so the system can estimate at what time the commando was created,
 			   the math would be: CommandExeTime = CurrentServTime - Packet Latency - Client View 
 			   This would move all other players back to where they were at the command execution time, then the user command would be exectued and finaly after the command is
